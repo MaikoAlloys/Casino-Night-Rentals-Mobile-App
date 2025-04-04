@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const authenticateCustomer = require("../middleware/authenticateCustomer");
 
 // Handle customer payment
 router.post("/order-payment", async (req, res) => {
@@ -115,5 +116,45 @@ router.delete("/cart/clear-cart", async (req, res) => {
         res.status(500).json({ success: false, message: "Error clearing cart" });
     }
 });
+
+
+// Fetch payments of logged-in customer
+router.get("/customer-payments", authenticateCustomer, async (req, res) => {
+    try {
+        const customerId = req.customer.id;
+        console.log("✅ Customer ID from Token:", customerId); // Debugging log
+
+        const query = `
+            SELECT 
+                p.reference_code, 
+                c.id AS customer_id, 
+                c.first_name, 
+                c.last_name, 
+                pr.name AS product_name, 
+                oi.quantity, 
+                p.payment_method, 
+                p.status, 
+                p.created_at,
+                p.total_amount  -- Include total_amount in the query
+            FROM payments p
+            JOIN customers c ON p.customer_id = c.id
+            JOIN order_items oi ON p.id = oi.payment_id
+            JOIN products pr ON oi.product_id = pr.id
+            WHERE p.customer_id = ?
+        `;
+
+        const [payments] = await pool.query(query, [customerId]);
+
+        if (payments.length === 0) {
+            return res.status(404).json({ error: "No payments found" });
+        }
+
+        res.json({ success: true, payments });
+    } catch (error) {
+        console.error("❌ Error fetching payments:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
 
 module.exports = router;

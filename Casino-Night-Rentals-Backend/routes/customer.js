@@ -319,6 +319,65 @@ router.get('/product/:productId', async (req, res) => {
   }
 });
 
+// Route to fetch event product booking details for the logged-in customer
+router.get('/event-product-bookings', authenticateCustomer, async (req, res) => {
+  try {
+    const customerId = req.customer.id; 
+
+    const [bookings] = await pool.query(`
+      SELECT 
+        epb.id AS booking_id,
+        c.first_name, 
+        c.last_name, 
+        p.name AS product_name, 
+        oi.quantity, 
+        epb.status
+      FROM event_product_booking epb
+      JOIN customers c ON epb.customer_id = c.id
+      JOIN products p ON epb.product_id = p.id
+      JOIN order_items oi 
+        ON epb.product_id = oi.product_id 
+        AND epb.payment_id = oi.payment_id
+      WHERE epb.customer_id = ?
+    `, [customerId]);
+
+    if (bookings.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this customer' });
+    }
+
+    res.status(200).json(bookings);
+    
+  } catch (err) {
+    console.error("❌ Error fetching event product bookings:", err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+});
+
+
+// Route to confirm a reservation
+router.put('/confirm-reservation/:id', authenticateCustomer, async (req, res) => {
+  try {
+    const customerId = req.customer.id;
+    const bookingId = req.params.id;
+
+    // Update the status of the reservation to 'confirmed'
+    const [result] = await pool.query(`
+      UPDATE event_product_booking
+      SET status = 'confirmed'
+      WHERE id = ? AND customer_id = ?`, 
+      [bookingId, customerId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Booking not found or you are not authorized to confirm this booking' });
+    }
+
+    res.status(200).json({ message: 'Reservation confirmed successfully' });
+  } catch (err) {
+    console.error("❌ Error confirming reservation:", err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+});
 
 
 module.exports = router;

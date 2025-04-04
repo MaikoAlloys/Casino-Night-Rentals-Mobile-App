@@ -193,8 +193,11 @@ export default function CustomerDashboard() {
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-cart"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>My Cart</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-order"); toggleSidebar(); }}>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-order-payments"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Orders</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-reservation"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Reservation</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/help"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Help</Text>
@@ -207,7 +210,7 @@ export default function CustomerDashboard() {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={async () => { 
                         await AsyncStorage.removeItem("customerToken"); 
-                        router.push("/customer-login"); 
+                        router.push("/"); 
                     }}>
                         <Text style={styles.navItem}>Logout</Text>
                     </TouchableOpacity>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 03, 2025 at 09:17 PM
+-- Generation Time: Apr 04, 2025 at 04:54 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,6 +60,79 @@ CREATE TABLE `customers` (
 INSERT INTO `customers` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`, `is_approved`) VALUES
 (1, 'Phoebe', 'Phoebe', 'Siaka', 'maikoa052@gmail.com', '0796901211', '$2b$10$R42J8jpyZWiZLUG2rHqyY.z9GWAB2Fl.7gqK09iq8RWAdrJqG71qG', '2025-04-02 17:16:49', 1),
 (2, 'Alex', 'Alex', 'Maiko', 'maiko052@gmail.com', '0796901210', '$2b$10$VEDERi4lFAM.KDyEGN..9.wTbaUjn/UI4MsIjEvA/uS88a9tFUawO', '2025-04-02 17:31:36', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_manager`
+--
+
+CREATE TABLE `event_manager` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `event_manager`
+--
+
+INSERT INTO `event_manager` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`) VALUES
+(1, 'Grace', 'Grace', 'Mwangi', 'grace.mwangi@gmail.com', '0740511256', '$2b$10$IiwUopRx6POQFiI02PzVQeVVBY3rqL9ytxuggp36x8Aa4W4mEuo6O', '2025-04-04 09:02:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_product_booking`
+--
+
+CREATE TABLE `event_product_booking` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `status` enum('pending','reserved','confirmed') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `payment_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `event_product_booking`
+--
+
+INSERT INTO `event_product_booking` (`id`, `customer_id`, `product_id`, `status`, `created_at`, `payment_id`) VALUES
+(3, 2, 3, 'confirmed', '2025-04-04 11:32:08', 16),
+(4, 1, 2, 'confirmed', '2025-04-04 12:30:07', 14),
+(5, 1, 3, 'reserved', '2025-04-04 12:30:07', 14),
+(7, 1, 3, 'reserved', '2025-04-04 12:30:10', 15);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `finance`
+--
+
+CREATE TABLE `finance` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `finance`
+--
+
+INSERT INTO `finance` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`) VALUES
+(1, 'Daniel', 'Daniel', 'Mwangi', 'danielmwangi@gmail.com', '0796901211', '$2b$10$0Qc8Ddy/kFPXrgvtVtdlje2T5DuQ3/wKUMmW6/Gf33uL6czEC1n22', '2025-04-04 06:18:14');
 
 -- --------------------------------------------------------
 
@@ -122,10 +195,10 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`id`, `reference_code`, `customer_id`, `payment_method`, `status`, `total_amount`, `created_at`) VALUES
-(13, 'QWERF34FDRE214', 1, 'bank', 'pending', 2000.00, '2025-04-03 17:56:27'),
-(14, 'QWERTFD234', 1, 'mpesa', 'pending', 3900.00, '2025-04-03 17:59:25'),
-(15, 'QWERTFRD32', 1, 'mpesa', 'pending', 1500.00, '2025-04-03 18:00:59'),
-(16, 'QWERTY32QW', 2, 'mpesa', 'pending', 1500.00, '2025-04-03 18:05:56');
+(13, 'QWERF34FDRE214', 1, 'bank', 'approved', 2000.00, '2025-04-03 17:56:27'),
+(14, 'QWERTFD234', 1, 'mpesa', 'approved', 3900.00, '2025-04-03 17:59:25'),
+(15, 'QWERTFRD32', 1, 'mpesa', 'approved', 1500.00, '2025-04-03 18:00:59'),
+(16, 'QWERTY32QW', 2, 'mpesa', 'approved', 1500.00, '2025-04-03 18:05:56');
 
 -- --------------------------------------------------------
 
@@ -215,6 +288,30 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `phone_number` (`phone_number`);
 
 --
+-- Indexes for table `event_manager`
+--
+ALTER TABLE `event_manager`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `event_product_booking`
+--
+ALTER TABLE `event_product_booking`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `fk_payment_id` (`payment_id`);
+
+--
+-- Indexes for table `finance`
+--
+ALTER TABLE `finance`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `phone_number` (`phone_number`);
+
+--
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
@@ -275,6 +372,24 @@ ALTER TABLE `customers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `event_manager`
+--
+ALTER TABLE `event_manager`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `event_product_booking`
+--
+ALTER TABLE `event_product_booking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `finance`
+--
+ALTER TABLE `finance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
@@ -320,6 +435,14 @@ ALTER TABLE `services`
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`),
   ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `event_product_booking`
+--
+ALTER TABLE `event_product_booking`
+  ADD CONSTRAINT `event_product_booking_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `event_product_booking_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_payment_id` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `orders`
