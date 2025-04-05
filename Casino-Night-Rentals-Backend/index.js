@@ -9,6 +9,9 @@ const customerRoutes = require("./routes/customer");
 const paymentsRoutes = require("./routes/payments");
 const financeRoutes = require("./routes/finance");
 const eventmanagerRoutes = require("./routes/eventmanager");
+const serviceRoutes = require("./routes/service");
+const servicemanagerRoutes = require("./routes/servicemanager");
+const dealersRoutes = require("./routes/dealers");
 
 const app = express();
 
@@ -22,6 +25,9 @@ app.use("/customer", customerRoutes);
 app.use("/payments", paymentsRoutes);
 app.use("/finance", financeRoutes);
 app.use("/eventmanager", eventmanagerRoutes);
+app.use("/service", serviceRoutes);
+app.use("/servicemanager", servicemanagerRoutes);
+app.use("/dealers", dealersRoutes);
 // Server setup
 const PORT = process.env.PORT || 5000;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView, Animated, Alert, ActivityIndicator } from "react-native";
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView, Animated, Alert, ActivityIndicator, TextInput } from "react-native";
 import { useRouter } from "expo-router";
 import api from "./api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,9 +9,20 @@ export default function CustomerDashboard() {
     const router = useRouter();
     const [products, setProducts] = useState([]);
     const [services, setServices] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [filteredServices, setFilteredServices] = useState([]);
     const [customer, setCustomer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedService, setSelectedService] = useState(null);
+    const [showServiceForm, setShowServiceForm] = useState(false);
+    const [formData, setFormData] = useState({
+        eventDate: "",
+        numberOfPeople: "",
+        paymentMethod: "Mpesa",
+        referenceCode: ""
+    });
     const sidebarAnim = useState(new Animated.Value(-250))[0];
 
     useEffect(() => {
@@ -43,8 +54,10 @@ export default function CustomerDashboard() {
             try {
                 const productResponse = await api.get("/customer/products");
                 setProducts(productResponse.data);
+                setFilteredProducts(productResponse.data);
                 const serviceResponse = await api.get("/customer/services");
                 setServices(serviceResponse.data);
+                setFilteredServices(serviceResponse.data);
             } catch (error) {
                 console.error("Error fetching products and services:", error);
                 Alert.alert("Error", "Failed to load products/services. Please try again.");
@@ -53,6 +66,22 @@ export default function CustomerDashboard() {
 
         fetchCustomerDetails();
     }, []);
+
+    useEffect(() => {
+        if (searchQuery) {
+            const filteredP = products.filter(product =>
+                product.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            const filteredS = services.filter(service =>
+                service.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredProducts(filteredP);
+            setFilteredServices(filteredS);
+        } else {
+            setFilteredProducts(products);
+            setFilteredServices(services);
+        }
+    }, [searchQuery, products, services]);
 
     const toggleSidebar = () => {
         Animated.timing(sidebarAnim, {
@@ -107,7 +136,6 @@ export default function CustomerDashboard() {
                 }
             }
         } catch (error) {
-            // console.error("Error during rent process:", error);
             if (error.response) {
                 if (error.response.status === 400 && error.response.data.message === 'Item already in cart') {
                     Alert.alert("Info", "This item is already in your cart.");
@@ -122,45 +150,69 @@ export default function CustomerDashboard() {
         }
     };
 
-    const handleBookNowPress = async (service) => {
+    const handleServiceCardPress = (service) => {
+        setSelectedService(service);
+        setFormData({
+            eventDate: "",
+            numberOfPeople: "",
+            paymentMethod: "Mpesa",
+            referenceCode: ""
+        });
+        setShowServiceForm(true);
+    };
+
+    const handleServiceBooking = async () => {
         try {
-            if (!customer) {
-                Alert.alert("Error", "Please log in to book a service.");
+            if (!formData.eventDate || !formData.numberOfPeople || !formData.referenceCode) {
+                Alert.alert("Error", "Please fill all fields");
+                return;
+            }
+
+            if (formData.paymentMethod === "Mpesa" && formData.referenceCode.length !== 10) {
+                Alert.alert("Error", "Mpesa reference code must be 10 characters");
+                return;
+            }
+
+            if (formData.paymentMethod === "Bank" && formData.referenceCode.length !== 14) {
+                Alert.alert("Error", "Bank reference code must be 14 characters");
+                return;
+            }
+
+            const token = await AsyncStorage.getItem("customerToken");
+            if (!token) {
                 router.push("/customer-login");
                 return;
             }
 
-            Alert.alert(
-                "Confirm Booking",
-                `Do you want to book ${service.name} for Kshs ${service.service_fee}?`,
-                [
-                    {
-                        text: "Cancel",
-                        style: "cancel"
-                    },
-                    { 
-                        text: "Book Now", 
-                        onPress: async () => {
-                            try {
-                                const response = await api.post('/customer/book-service', {
-                                    customer_id: customer.id,
-                                    service_id: service.id,
-                                    service_name: service.name,
-                                    service_fee: service.service_fee,
-                                    booking_fee: service.booking_fee
-                                });
-                                Alert.alert("Success", "Service booked successfully!");
-                            } catch (error) {
-                                console.error("Error booking service:", error);
-                                Alert.alert("Error", "Failed to book service. Please try again.");
-                            }
-                        }
+            const response = await api.post('/service/book', {
+                serviceId: selectedService.id,
+                eventDate: formData.eventDate,
+                numberOfPeople: formData.numberOfPeople,
+                bookingFee: selectedService.booking_fee,
+                paymentMethod: formData.paymentMethod,
+                referenceCode: formData.referenceCode
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.status === 200) {
+                setShowServiceForm(false); // Close the modal first
+                router.push({
+                    pathname: "/customer-service-booking",
+                    params: { 
+                        bookingSuccess: true,
+                        serviceName: selectedService.name,
+                        bookingDetails: JSON.stringify({
+                            eventDate: formData.eventDate,
+                            numberOfPeople: formData.numberOfPeople,
+                            bookingFee: selectedService.booking_fee
+                        })
                     }
-                ]
-            );
+                });
+            }
         } catch (error) {
-            console.error("Error initiating booking:", error);
-            Alert.alert("Error", "Failed to initiate booking. Please try again.");
+            console.error("Error booking service:", error);
+            Alert.alert("Error", error.response?.data?.message || "Failed to book service. Please try again.");
         }
     };
 
@@ -199,6 +251,9 @@ export default function CustomerDashboard() {
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-reservation"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Reservation</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-service-booking"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Service bookings</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/help"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Help</Text>
                     </TouchableOpacity>
@@ -231,12 +286,23 @@ export default function CustomerDashboard() {
                 </View>
 
                 <ScrollView style={styles.content}>
+                    {/* Search Bar */}
+                    <View style={styles.searchContainer}>
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Search products or services..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
+                        <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
+                    </View>
+
                     <Text style={styles.sectionTitle}>Available Products</Text>
-                    {products.length === 0 ? (
+                    {filteredProducts.length === 0 ? (
                         <Text style={styles.emptyMessage}>No products available at the moment.</Text>
                     ) : (
                         <FlatList
-                            data={products}
+                            data={filteredProducts}
                             keyExtractor={(item) => `product-${item.id}`}
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -263,31 +329,101 @@ export default function CustomerDashboard() {
                     )}
 
                     <Text style={styles.sectionTitle}>Available Services</Text>
-                    {services.length === 0 ? (
+                    {filteredServices.length === 0 ? (
                         <Text style={styles.emptyMessage}>No services available at the moment.</Text>
                     ) : (
                         <FlatList
-                            data={services}
+                            data={filteredServices}
                             keyExtractor={(item) => `service-${item.id}`}
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             renderItem={({ item }) => (
-                                <View style={styles.card}>
+                                <TouchableOpacity 
+                                    style={styles.card}
+                                    onPress={() => handleServiceCardPress(item)}
+                                >
                                     <Text style={styles.name}>{item.name}</Text>
-                                    <Text style={styles.price}>Service Fee: Kshs {item.service_fee}</Text>
                                     <Text style={styles.price}>Booking Fee: Kshs {item.booking_fee}</Text>
                                     <TouchableOpacity 
                                         style={styles.button}
-                                        onPress={() => handleBookNowPress(item)}
                                     >
                                         <Text style={styles.buttonText}>Book Now</Text>
                                     </TouchableOpacity>
-                                </View>
+                                </TouchableOpacity>
                             )}
                         />
                     )}
                 </ScrollView>
             </View>
+
+            {/* Service Booking Modal */}
+            {showServiceForm && selectedService && (
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Book {selectedService.name}</Text>
+                        
+                        <Text style={styles.formLabel}>Event Date</Text>
+                        <TextInput
+                            style={styles.formInput}
+                            placeholder="YYYY-MM-DD"
+                            value={formData.eventDate}
+                            onChangeText={(text) => setFormData({...formData, eventDate: text})}
+                        />
+
+                        <Text style={styles.formLabel}>Number of People</Text>
+                        <TextInput
+                            style={styles.formInput}
+                            placeholder="Enter number of people"
+                            keyboardType="numeric"
+                            value={formData.numberOfPeople}
+                            onChangeText={(text) => setFormData({...formData, numberOfPeople: text})}
+                        />
+
+                        <Text style={styles.formLabel}>Payment Method</Text>
+                        <View style={styles.radioGroup}>
+                            <TouchableOpacity 
+                                style={[styles.radioButton, formData.paymentMethod === "Mpesa" && styles.radioButtonSelected]}
+                                onPress={() => setFormData({...formData, paymentMethod: "Mpesa"})}
+                            >
+                                <Text style={formData.paymentMethod === "Mpesa" ? styles.radioTextSelected : styles.radioText}>Mpesa</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={[styles.radioButton, formData.paymentMethod === "Bank" && styles.radioButtonSelected]}
+                                onPress={() => setFormData({...formData, paymentMethod: "Bank"})}
+                            >
+                                <Text style={formData.paymentMethod === "Bank" ? styles.radioTextSelected : styles.radioText}>Bank</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.formLabel}>Reference Code</Text>
+                        <TextInput
+                            style={styles.formInput}
+                            placeholder={formData.paymentMethod === "Mpesa" ? "10-digit Mpesa code" : "14-digit Bank code"}
+                            value={formData.referenceCode}
+                            onChangeText={(text) => setFormData({...formData, referenceCode: text})}
+                            maxLength={formData.paymentMethod === "Mpesa" ? 10 : 14}
+                            autoCapitalize="characters"
+                        />
+
+                        <Text style={styles.feeText}>Booking Fee: Kshs {selectedService.booking_fee}</Text>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity 
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setShowServiceForm(false)}
+                            >
+                                <Text style={styles.buttonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={[styles.modalButton, styles.confirmButton]}
+                                onPress={handleServiceBooking}
+                            >
+                                <Text style={styles.buttonText}>Confirm Booking</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            )}
         </View>
     );
 }
@@ -372,6 +508,22 @@ const styles = StyleSheet.create({
     content: {
         padding: 15,
     },
+    searchContainer: {
+        position: 'relative',
+        marginBottom: 20,
+    },
+    searchInput: {
+        backgroundColor: '#f0f0f0',
+        borderRadius: 25,
+        padding: 10,
+        paddingLeft: 40,
+        fontSize: 16,
+    },
+    searchIcon: {
+        position: 'absolute',
+        left: 15,
+        top: 12,
+    },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -436,5 +588,86 @@ const styles = StyleSheet.create({
     },
     mainContent: {
         flex: 1,
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1001,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '90%',
+        maxWidth: 400,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    formLabel: {
+        marginTop: 10,
+        marginBottom: 5,
+        fontWeight: 'bold',
+    },
+    formInput: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 15,
+    },
+    radioGroup: {
+        flexDirection: 'row',
+        marginBottom: 15,
+    },
+    radioButton: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+    },
+    radioButtonSelected: {
+        backgroundColor: '#007bff',
+        borderColor: '#007bff',
+    },
+    radioText: {
+        color: '#000',
+    },
+    radioTextSelected: {
+        color: '#fff',
+    },
+    feeText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    modalButton: {
+        flex: 1,
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginHorizontal: 5,
+    },
+    cancelButton: {
+        backgroundColor: '#dc3545',
+    },
+    confirmButton: {
+        backgroundColor: '#28a745',
     },
 });

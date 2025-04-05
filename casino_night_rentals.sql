@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2025 at 04:54 PM
+-- Generation Time: Apr 05, 2025 at 07:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,6 +64,54 @@ INSERT INTO `customers` (`id`, `username`, `first_name`, `last_name`, `email`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `dealers`
+--
+
+CREATE TABLE `dealers` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `dealers`
+--
+
+INSERT INTO `dealers` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`) VALUES
+(1, 'Stephen', 'Stephen', 'Mwangi', 'stephen.mwangi@gmail.com', '0711001100', '$2b$10$arASIO.PygXoWZ7CMYse5uaQq/aICJ9FeONX0cl/RsvBPDdhFwCfq', '2025-04-05 13:08:50'),
+(2, 'Doris', 'Doris', 'Kerubo', 'doris.kerubo@gmail.com', '0722002200', '$2b$10$irefyLncLy0UJf2bhDal6O6AUW.4jnlIKBh7WOL.V8O0R7M5WxY16', '2025-04-05 13:08:50'),
+(3, 'Dancun', 'Dancun', 'Kaguyo', 'dancun.kaguyo@gmail.com', '0733003300', '$2b$10$OGuKKK95iaY5WuPODBOkQOHMk/NbztUNLxmHn2O2AHQA5/HipeG3m', '2025-04-05 13:08:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dealer_assignments`
+--
+
+CREATE TABLE `dealer_assignments` (
+  `id` int(11) NOT NULL,
+  `service_booking_id` int(11) NOT NULL,
+  `dealer_id` int(11) NOT NULL,
+  `assigned_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `service_id` int(11) NOT NULL,
+  `number_of_customers` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `dealer_assignments`
+--
+
+INSERT INTO `dealer_assignments` (`id`, `service_booking_id`, `dealer_id`, `assigned_at`, `service_id`, `number_of_customers`) VALUES
+(10, 2, 2, '2025-04-05 16:15:31', 1, 50);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `event_manager`
 --
 
@@ -107,8 +155,9 @@ CREATE TABLE `event_product_booking` (
 INSERT INTO `event_product_booking` (`id`, `customer_id`, `product_id`, `status`, `created_at`, `payment_id`) VALUES
 (3, 2, 3, 'confirmed', '2025-04-04 11:32:08', 16),
 (4, 1, 2, 'confirmed', '2025-04-04 12:30:07', 14),
-(5, 1, 3, 'reserved', '2025-04-04 12:30:07', 14),
-(7, 1, 3, 'reserved', '2025-04-04 12:30:10', 15);
+(5, 1, 3, 'confirmed', '2025-04-04 12:30:07', 14),
+(7, 1, 3, 'reserved', '2025-04-04 12:30:10', 15),
+(8, 1, 1, 'reserved', '2025-04-04 15:19:34', 13);
 
 -- --------------------------------------------------------
 
@@ -240,6 +289,13 @@ CREATE TABLE `product_cart` (
   `product_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `product_cart`
+--
+
+INSERT INTO `product_cart` (`id`, `customer_id`, `product_name`, `quantity`, `rental_price`, `image_url`, `created_at`, `product_id`) VALUES
+(42, 1, 'L.E.D ROULETTE TABLE\r\n', 1, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', '2025-04-05 07:17:30', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -266,6 +322,63 @@ INSERT INTO `services` (`id`, `name`, `service_fee`, `booking_fee`) VALUES
 (6, 'Get Together', 10500.00, 200.00),
 (7, 'Product Launch', 15000.00, 200.00);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `service_booking`
+--
+
+CREATE TABLE `service_booking` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `event_date` date NOT NULL,
+  `number_of_people` int(11) NOT NULL,
+  `booking_fee` decimal(10,2) NOT NULL,
+  `payment_method` enum('mpesa','bank') NOT NULL,
+  `reference_code` varchar(100) NOT NULL,
+  `status` enum('pending','approved','assigned') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `service_booking`
+--
+
+INSERT INTO `service_booking` (`id`, `customer_id`, `service_id`, `event_date`, `number_of_people`, `booking_fee`, `payment_method`, `reference_code`, `status`, `created_at`) VALUES
+(2, 1, 1, '2025-04-05', 50, 5000.00, 'mpesa', 'qwerfgdf23', 'assigned', '2025-04-05 07:08:28'),
+(3, 2, 4, '2025-04-10', 10, 200.00, 'mpesa', 'QWERFDE43E', 'approved', '2025-04-05 07:16:44'),
+(4, 1, 4, '2025-04-25', 20, 200.00, 'mpesa', 'QWE32RTF4W', 'assigned', '2025-04-05 07:18:34'),
+(5, 1, 4, '2025-04-25', 20, 200.00, 'mpesa', 'QWE32RTF4W', 'assigned', '2025-04-05 07:18:38'),
+(6, 1, 1, '2025-04-25', 2, 200.00, 'mpesa', 'QWERTF34TY', 'assigned', '2025-04-05 07:27:53'),
+(7, 1, 1, '0000-00-00', 27, 200.00, 'mpesa', 'QWE54FGTRD', 'approved', '2025-04-05 07:29:23'),
+(8, 1, 1, '2025-04-07', 15, 200.00, 'mpesa', 'QWERFYGFD4', 'pending', '2025-04-05 07:34:08'),
+(9, 1, 1, '2025-05-10', 99, 200.00, 'mpesa', 'QWED34ERF3', 'assigned', '2025-04-05 07:48:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `service_manager`
+--
+
+CREATE TABLE `service_manager` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `service_manager`
+--
+
+INSERT INTO `service_manager` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`) VALUES
+(1, 'John', 'John', 'Kangeth\'e', 'john.kangethe@gmail.com', '0789342312', '$2b$10$aItDzTTdKEIrfNXVk3vEQ./eAEz2GpZ4hAeOnz3jS7Ec2hr4BeTuK', '2025-04-05 12:30:46');
+
 --
 -- Indexes for dumped tables
 --
@@ -286,6 +399,21 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `phone_number` (`phone_number`);
+
+--
+-- Indexes for table `dealers`
+--
+ALTER TABLE `dealers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `dealer_assignments`
+--
+ALTER TABLE `dealer_assignments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `service_booking_id` (`service_booking_id`),
+  ADD KEY `dealer_id` (`dealer_id`),
+  ADD KEY `service_id` (`service_id`);
 
 --
 -- Indexes for table `event_manager`
@@ -356,6 +484,20 @@ ALTER TABLE `services`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `service_booking`
+--
+ALTER TABLE `service_booking`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `service_id` (`service_id`);
+
+--
+-- Indexes for table `service_manager`
+--
+ALTER TABLE `service_manager`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -372,6 +514,18 @@ ALTER TABLE `customers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `dealers`
+--
+ALTER TABLE `dealers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `dealer_assignments`
+--
+ALTER TABLE `dealer_assignments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT for table `event_manager`
 --
 ALTER TABLE `event_manager`
@@ -381,7 +535,7 @@ ALTER TABLE `event_manager`
 -- AUTO_INCREMENT for table `event_product_booking`
 --
 ALTER TABLE `event_product_booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `finance`
@@ -417,13 +571,25 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_cart`
 --
 ALTER TABLE `product_cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `service_booking`
+--
+ALTER TABLE `service_booking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `service_manager`
+--
+ALTER TABLE `service_manager`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -435,6 +601,14 @@ ALTER TABLE `services`
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`),
   ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `dealer_assignments`
+--
+ALTER TABLE `dealer_assignments`
+  ADD CONSTRAINT `dealer_assignments_ibfk_1` FOREIGN KEY (`service_booking_id`) REFERENCES `service_booking` (`id`),
+  ADD CONSTRAINT `dealer_assignments_ibfk_2` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`),
+  ADD CONSTRAINT `dealer_assignments_ibfk_3` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`);
 
 --
 -- Constraints for table `event_product_booking`
@@ -470,6 +644,13 @@ ALTER TABLE `payments`
 ALTER TABLE `product_cart`
   ADD CONSTRAINT `product_cart_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`),
   ADD CONSTRAINT `product_cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `service_booking`
+--
+ALTER TABLE `service_booking`
+  ADD CONSTRAINT `service_booking_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`),
+  ADD CONSTRAINT `service_booking_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

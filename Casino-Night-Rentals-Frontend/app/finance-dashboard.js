@@ -98,6 +98,9 @@ const FinanceDashboard = () => {
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-dashboard"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Pending Payments</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-service-booking"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Service bookings</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={async () => { 
                         await AsyncStorage.removeItem("financeToken"); 
                         router.push("/"); 
