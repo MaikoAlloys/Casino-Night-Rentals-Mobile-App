@@ -197,18 +197,10 @@ export default function CustomerDashboard() {
 
             if (response.status === 200) {
                 setShowServiceForm(false); // Close the modal first
-                router.push({
-                    pathname: "/customer-service-booking",
-                    params: { 
-                        bookingSuccess: true,
-                        serviceName: selectedService.name,
-                        bookingDetails: JSON.stringify({
-                            eventDate: formData.eventDate,
-                            numberOfPeople: formData.numberOfPeople,
-                            bookingFee: selectedService.booking_fee
-                        })
-                    }
-                });
+                router.push("/customer-service-booking");
+            } else {
+                setShowServiceForm(false); // Close the modal first
+                router.push("/customer-service-booking");
             }
         } catch (error) {
             console.error("Error booking service:", error);
@@ -253,6 +245,9 @@ export default function CustomerDashboard() {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-service-booking"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Service bookings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-service-quotation"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Service Quotations</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/help"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Help</Text>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import api from './api';
 import { useRouter } from 'expo-router';
+import api from './api';
 
-export default function DealerLogin() {
+const StorekeeperLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,23 +12,23 @@ export default function DealerLogin() {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      return Alert.alert('Missing Fields', 'Please enter both username and password');
+      Alert.alert('Missing Fields', 'Please enter both username and password');
+      return;
     }
 
     try {
       setLoading(true);
-      const res = await api.post('/dealers/login', { username, password });
-      const dealer = res.data.dealer;
+      const response = await api.post('/storekeeper/login', { username, password });
 
-      console.log("Dealer ID:", dealer.id);
-
-      Alert.alert('Login Successful', `Welcome ${dealer.first_name || dealer.username}`);
-
-      // Pass dealer ID to next page
-      router.push({ pathname: '/dealer-dashboard', params: { id: dealer.id } });
-
+      if (response.data.success) {
+        const { user } = response.data;
+        Alert.alert('Login Successful', `Welcome ${user.full_name || user.username}`);
+        router.push('/storekeeper-dashboard');
+      } else {
+        throw new Error(response.data.message || 'Login failed');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Login error:', error);
       Alert.alert(
         'Login Failed',
         error.response?.data?.message || 'Invalid credentials. Please try again.'
@@ -41,9 +41,9 @@ export default function DealerLogin() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialIcons name="account-circle" size={80} color="#3498db" />
-        <Text style={styles.title}>Dealer Portal</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
+        <MaterialIcons name="inventory" size={80} color="#3498db" />
+        <Text style={styles.title}>Storekeeper Portal</Text>
+        <Text style={styles.subtitle}>Sign in to manage inventory</Text>
       </View>
 
       <View style={styles.inputContainer}>
@@ -83,7 +83,7 @@ export default function DealerLogin() {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -150,3 +150,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export default StorekeeperLogin;
