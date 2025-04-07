@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 06, 2025 at 05:56 PM
+-- Generation Time: Apr 07, 2025 at 08:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,7 +75,7 @@ CREATE TABLE `customer_service_payment` (
   `service_booking_id` int(11) NOT NULL,
   `payment_method` enum('mpesa','bank') NOT NULL,
   `reference_code` varchar(100) NOT NULL,
-  `status` enum('pending','approved') DEFAULT 'pending',
+  `status` enum('pending','approved','released','completed','confirmed') DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -84,7 +84,8 @@ CREATE TABLE `customer_service_payment` (
 --
 
 INSERT INTO `customer_service_payment` (`id`, `total_cost`, `customer_id`, `service_id`, `service_booking_id`, `payment_method`, `reference_code`, `status`, `created_at`) VALUES
-(3, 430.00, 2, 4, 3, 'bank', 'WWASRETG34CVGD', 'pending', '2025-04-06 15:33:16');
+(3, 430.00, 2, 4, 3, 'bank', 'WWASRETG34CVGD', 'confirmed', '2025-04-06 15:33:16'),
+(4, 1220.00, 2, 3, 10, 'mpesa', 'QWERTY4564', 'confirmed', '2025-04-07 05:26:26');
 
 -- --------------------------------------------------------
 
@@ -162,11 +163,11 @@ CREATE TABLE `dealer_selected_items` (
 --
 
 INSERT INTO `dealer_selected_items` (`id`, `store_item_id`, `service_id`, `dealer_id`, `customer_id`, `item_cost`, `quantity`, `status`, `created_at`, `service_booking_id`) VALUES
-(27, 16, 4, 1, 2, 180.00, 1, 'paid', '2025-04-06 13:29:06', 3),
-(28, 17, 4, 1, 2, 150.00, 1, 'paid', '2025-04-06 13:29:06', 3),
-(29, 19, 4, 1, 2, 100.00, 1, 'paid', '2025-04-06 13:29:06', 3),
-(30, 12, 3, 3, 2, 100.00, 1, 'pending', '2025-04-06 15:52:45', 10),
-(31, 14, 3, 3, 2, 80.00, 14, 'pending', '2025-04-06 15:52:45', 10);
+(27, 16, 4, 1, 2, 180.00, 1, 'approved', '2025-04-06 13:29:06', 3),
+(28, 17, 4, 1, 2, 150.00, 1, 'approved', '2025-04-06 13:29:06', 3),
+(29, 19, 4, 1, 2, 100.00, 1, 'approved', '2025-04-06 13:29:06', 3),
+(30, 12, 3, 3, 2, 100.00, 1, 'approved', '2025-04-06 15:52:45', 10),
+(31, 14, 3, 3, 2, 80.00, 14, 'approved', '2025-04-06 15:52:45', 10);
 
 -- --------------------------------------------------------
 
@@ -217,6 +218,35 @@ INSERT INTO `event_product_booking` (`id`, `customer_id`, `product_id`, `status`
 (5, 1, 3, 'confirmed', '2025-04-04 12:30:07', 14),
 (7, 1, 3, 'reserved', '2025-04-04 12:30:10', 15),
 (8, 1, 1, 'reserved', '2025-04-04 15:19:34', 13);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `feedback_id` int(11) NOT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `dealer_id` int(11) DEFAULT NULL,
+  `service_manager_id` int(11) DEFAULT NULL,
+  `finance_id` int(11) DEFAULT NULL,
+  `event_manager_id` int(11) DEFAULT NULL,
+  `message` text DEFAULT NULL,
+  `rating` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('pending','resolved') DEFAULT 'pending',
+  `reply` text DEFAULT NULL,
+  `reply_by` varchar(255) DEFAULT NULL,
+  `reply_time` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`feedback_id`, `customer_id`, `dealer_id`, `service_manager_id`, `finance_id`, `event_manager_id`, `message`, `rating`, `created_at`, `status`, `reply`, `reply_by`, `reply_time`) VALUES
+(7, 1, 1, NULL, NULL, NULL, 'Sasa Nyangweso', 3, '2025-04-07 18:32:50', 'resolved', 'Niaje Nyasuguta!', 'Dealer 1', '2025-04-07 18:33:50');
 
 -- --------------------------------------------------------
 
@@ -494,14 +524,14 @@ INSERT INTO `store_items` (`id`, `service_id`, `item_name`, `item_cost_per_perso
 (9, 2, 'Branded Giveaways', 60.00, 100, '2025-04-06 06:25:22'),
 (10, 2, 'Catering (Snacks & Drinks)', 250.00, 100, '2025-04-06 06:25:22'),
 (11, 3, 'Birthday Cake', 150.00, 100, '2025-04-06 06:25:22'),
-(12, 3, 'Decorations & Balloons', 100.00, 100, '2025-04-06 06:25:22'),
+(12, 3, 'Decorations & Balloons', 100.00, 99, '2025-04-06 06:25:22'),
 (13, 3, 'Entertainment (DJ/MC)', 120.00, 100, '2025-04-06 06:25:22'),
-(14, 3, 'Party Packs for Kids', 80.00, 100, '2025-04-06 06:25:22'),
+(14, 3, 'Party Packs for Kids', 80.00, 86, '2025-04-06 06:25:22'),
 (15, 3, 'Food & Soft Drinks', 200.00, 100, '2025-04-06 06:25:22'),
-(16, 4, 'Sound & DJ Equipment', 180.00, 100, '2025-04-06 06:25:22'),
-(17, 4, 'Tents & Seating', 150.00, 100, '2025-04-06 06:25:22'),
+(16, 4, 'Sound & DJ Equipment', 180.00, 97, '2025-04-06 06:25:22'),
+(17, 4, 'Tents & Seating', 150.00, 97, '2025-04-06 06:25:22'),
 (18, 4, 'Buffet Catering', 300.00, 100, '2025-04-06 06:25:22'),
-(19, 4, 'Decor & Lighting', 100.00, 100, '2025-04-06 06:25:22'),
+(19, 4, 'Decor & Lighting', 100.00, 97, '2025-04-06 06:25:22'),
 (20, 4, 'Photo Booth Setup', 90.00, 100, '2025-04-06 06:25:22'),
 (21, 5, 'Card & Board Games', 60.00, 100, '2025-04-06 06:25:22'),
 (22, 5, 'Game Tables & Chairs', 80.00, 100, '2025-04-06 06:25:22'),
@@ -589,6 +619,17 @@ ALTER TABLE `event_product_booking`
   ADD KEY `customer_id` (`customer_id`),
   ADD KEY `product_id` (`product_id`),
   ADD KEY `fk_payment_id` (`payment_id`);
+
+--
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `dealer_id` (`dealer_id`),
+  ADD KEY `service_manager_id` (`service_manager_id`),
+  ADD KEY `finance_id` (`finance_id`),
+  ADD KEY `event_manager_id` (`event_manager_id`);
 
 --
 -- Indexes for table `finance`
@@ -690,7 +731,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `customer_service_payment`
 --
 ALTER TABLE `customer_service_payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `dealers`
@@ -721,6 +762,12 @@ ALTER TABLE `event_manager`
 --
 ALTER TABLE `event_product_booking`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `finance`
@@ -832,6 +879,16 @@ ALTER TABLE `event_product_booking`
   ADD CONSTRAINT `event_product_booking_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `event_product_booking_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_payment_id` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`),
+  ADD CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`),
+  ADD CONSTRAINT `feedback_ibfk_3` FOREIGN KEY (`service_manager_id`) REFERENCES `service_manager` (`id`),
+  ADD CONSTRAINT `feedback_ibfk_4` FOREIGN KEY (`finance_id`) REFERENCES `finance` (`id`),
+  ADD CONSTRAINT `feedback_ibfk_5` FOREIGN KEY (`event_manager_id`) REFERENCES `event_manager` (`id`);
 
 --
 -- Constraints for table `orders`

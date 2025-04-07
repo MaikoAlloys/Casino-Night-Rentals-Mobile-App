@@ -223,4 +223,85 @@ router.post("/approve-service-booking", async (req, res) => {
     }
 });
 
+
+
+// Fetch pending customer service payments with store items
+router.get("/pending-customer-service-payments", async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                csp.id,
+                csp.total_cost,
+                CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+                s.name AS service_name,
+                si.item_name AS store_item_name,
+                csp.payment_method,
+                csp.reference_code,
+                csp.created_at AS payment_date
+            FROM customer_service_payment csp
+            JOIN customers c ON csp.customer_id = c.id
+            JOIN services s ON csp.service_id = s.id
+            JOIN dealer_selected_items dsi ON csp.service_booking_id = dsi.service_booking_id
+            JOIN store_items si ON dsi.store_item_id = si.id
+            WHERE csp.status = 'pending'
+        `;
+
+        const [results] = await pool.query(query);
+
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error("❌ Error fetching pending customer service payments:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+
+// Approve customer service payment
+router.post("/approve-customer-service-payment", async (req, res) => {
+    const { payment_id } = req.body;
+
+    try {
+        // Step 1: Update the customer_service_payment status
+        const updatePaymentQuery = `
+            UPDATE customer_service_payment
+            SET status = 'approved'
+            WHERE id = ?
+        `;
+        const [paymentResult] = await pool.query(updatePaymentQuery, [payment_id]);
+
+        if (paymentResult.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Payment not found or already approved" });
+        }
+
+        // Step 2: Get the service_booking_id for the payment
+        const [[bookingRow]] = await pool.query(
+            "SELECT service_booking_id FROM customer_service_payment WHERE id = ?",
+            [payment_id]
+        );
+
+        if (!bookingRow) {
+            return res.status(404).json({ success: false, message: "Service booking not found" });
+        }
+
+        const serviceBookingId = bookingRow.service_booking_id;
+
+        // Step 3: Update related dealer_selected_items to approved
+        const updateDealerItemsQuery = `
+            UPDATE dealer_selected_items
+            SET status = 'approved'
+            WHERE service_booking_id = ? AND status = 'paid'
+        `;
+        await pool.query(updateDealerItemsQuery, [serviceBookingId]);
+
+        res.json({ success: true, message: "Customer service payment approved successfully" });
+    } catch (error) {
+        console.error("❌ Error approving customer service payment:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+});
+
 module.exports = router;

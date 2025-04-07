@@ -111,5 +111,102 @@ router.get('/profile', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch storekeeper data' });
     }
   });
-  
+// Fetch approved customer service payments, related store items, and total cost
+router.get("/approved-customer-service-payments", async (req, res) => {
+  try {
+      const query = `
+          SELECT 
+              csp.id AS payment_id,
+              CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+              s.name AS service_name,
+              si.item_name AS store_item_name,
+              CONCAT(d.first_name, ' ', d.last_name) AS dealer_name,
+              dsi.quantity,
+              csp.status AS payment_status,
+              csp.total_cost,
+              csp.service_booking_id  -- Added the service_booking_id here
+          FROM customer_service_payment csp
+          JOIN customers c ON csp.customer_id = c.id
+          JOIN services s ON csp.service_id = s.id
+          JOIN dealer_selected_items dsi ON csp.service_booking_id = dsi.service_booking_id
+          JOIN store_items si ON dsi.store_item_id = si.id
+          JOIN dealers d ON dsi.dealer_id = d.id
+          WHERE csp.status = 'approved';
+      `;
+
+      const [results] = await pool.query(query);
+
+      res.json({ success: true, data: results });
+  } catch (error) {
+      console.error("❌ Error fetching approved customer service payments:", error);
+      res.status(500).json({
+          success: false,
+          message: "Server error",
+          error: error.message
+      });
+  }
+});
+
+
+// Endpoint for storekeeper to release items and subtract from stock
+router.put("/release-items/:serviceBookingId", async (req, res) => {
+  const { serviceBookingId } = req.params;
+
+  // Get a connection from the pool
+  const connection = await pool.getConnection();
+
+  try {
+      // Begin a transaction
+      await connection.beginTransaction();
+
+      // Step 1: Update the status in customer_service_payment from 'approved' to 'released'
+      const updateStatusQuery = `
+          UPDATE customer_service_payment 
+          SET status = 'released' 
+          WHERE service_booking_id = ? 
+            AND status = 'approved';
+      `;
+      await connection.query(updateStatusQuery, [serviceBookingId]);
+
+      // Step 2: Subtract quantity of each store item selected by the dealer from store_items
+      const getSelectedItemsQuery = `
+          SELECT dsi.store_item_id, dsi.quantity 
+          FROM dealer_selected_items dsi
+          WHERE dsi.service_booking_id = ?;
+      `;
+      const [selectedItems] = await connection.query(getSelectedItemsQuery, [serviceBookingId]);
+
+      // Subtract each selected quantity from the store_items table
+      for (const item of selectedItems) {
+          const subtractQuantityQuery = `
+              UPDATE store_items
+              SET quantity = quantity - ?
+              WHERE id = ?;
+          `;
+          await connection.query(subtractQuantityQuery, [item.quantity, item.store_item_id]);
+      }
+
+      // Commit the transaction
+      await connection.commit();
+
+      // Release the connection back to the pool
+      connection.release();
+
+      res.json({ success: true, message: 'Items released and stock updated successfully.' });
+  } catch (error) {
+      // If any error occurs, rollback the transaction
+      await connection.rollback();
+      console.error("❌ Error releasing items and updating stock:", error);
+
+      // Release the connection back to the pool even if there is an error
+      connection.release();
+
+      res.status(500).json({
+          success: false,
+          message: "Server error",
+          error: error.message
+      });
+  }
+});
+
 module.exports = router;

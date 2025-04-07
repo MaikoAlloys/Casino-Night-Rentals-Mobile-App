@@ -96,10 +96,16 @@ const FinanceDashboard = () => {
                         <Text style={styles.navItem}>Profile</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-dashboard"); toggleSidebar(); }}>
-                        <Text style={styles.navItem}>Pending Payments</Text>
+                        <Text style={styles.navItem}>Pending Product Payments</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-service-booking"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Service bookings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-service-payments"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Service payments</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-feedback"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Feedback</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={async () => { 
                         await AsyncStorage.removeItem("financeToken"); 
@@ -119,7 +125,7 @@ const FinanceDashboard = () => {
                 <Text style={styles.title}>Pending Payments</Text>
                 {!loading && (
                     <Text style={styles.subtitle}>
-                        {pendingPayments.length} payment{pendingPayments.length !== 1 ? 's' : ''} awaiting approval
+                        {pendingPayments.length} product payment{pendingPayments.length !== 1 ? 's' : ''} awaiting approval
                     </Text>
                 )}
             </View>

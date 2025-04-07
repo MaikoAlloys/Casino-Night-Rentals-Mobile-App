@@ -400,6 +400,7 @@ const DealerDashboard = () => {
             <Text style={styles.navItem}>Profile</Text>
           </TouchableOpacity>
           
+
           <TouchableOpacity 
             style={styles.navButton} 
             onPress={() => { 
@@ -411,6 +412,18 @@ const DealerDashboard = () => {
             <Text style={styles.navItem}>Complete Service</Text>
           </TouchableOpacity>
           
+
+          <TouchableOpacity 
+             style={styles.navButton} 
+             onPress={() => { 
+              router.push(`/dealer-feedback/${dealerId}`); 
+              toggleSidebar(); 
+               }}
+             >
+            <MaterialIcons name="feedback" size={20} color="#4A90E2" />
+          <Text style={styles.navItem}>Feedback</Text>
+         </TouchableOpacity>
+      
           <TouchableOpacity 
             style={styles.navButton} 
             onPress={async () => { 

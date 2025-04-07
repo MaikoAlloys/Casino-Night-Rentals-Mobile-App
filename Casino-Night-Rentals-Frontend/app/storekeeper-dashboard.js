@@ -149,12 +149,12 @@ const StorekeeperDashboard = () => {
           <TouchableOpacity 
             style={styles.navButton}
             onPress={() => { 
-              router.push("/storekeeper-requests"); 
+              router.push("/storekeeper-service-material-requests"); 
               toggleSidebar(); 
             }}
           >
             <MaterialIcons name="inventory" size={20} color="#3498db" />
-            <Text style={styles.navItem}>Requests</Text>
+            <Text style={styles.navItem}>Service Material Requests</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.navButton}

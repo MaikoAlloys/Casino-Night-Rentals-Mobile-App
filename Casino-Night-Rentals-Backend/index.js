@@ -13,6 +13,7 @@ const serviceRoutes = require("./routes/service");
 const servicemanagerRoutes = require("./routes/servicemanager");
 const dealersRoutes = require("./routes/dealers");
 const storekeeperRoutes = require("./routes/storekeeper");
+const feedbackRoutes = require("./routes/feedback");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/service", serviceRoutes);
 app.use("/servicemanager", servicemanagerRoutes);
 app.use("/dealers", dealersRoutes);
 app.use("/storekeeper", storekeeperRoutes);
+app.use("/feedback", feedbackRoutes);
 // Server setup
 const PORT = process.env.PORT || 5000;
 

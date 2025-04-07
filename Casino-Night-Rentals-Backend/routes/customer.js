@@ -380,4 +380,111 @@ router.put('/confirm-reservation/:id', authenticateCustomer, async (req, res) =>
 });
 
 
+// Route to fetch service payment details for the logged-in customer
+router.get('/customer-service-details', authenticateCustomer, async (req, res) => {
+  try {
+    const customerId = req.customer.id;  // Logged-in customer's ID
+
+    // Fetch customer service details along with event details
+    const query = `
+      SELECT 
+        csp.id AS payment_id,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+        s.name AS service_name,
+        csp.total_cost,
+        csp.reference_code,
+        csp.payment_method,
+        csp.status AS payment_status,
+        CONCAT(d.first_name, ' ', d.last_name) AS dealer_name,
+        sb.number_of_people,
+        sb.event_date
+      FROM customer_service_payment csp
+      JOIN customers c ON csp.customer_id = c.id
+      JOIN services s ON csp.service_id = s.id
+      JOIN dealer_assignments da ON csp.service_booking_id = da.service_booking_id
+      JOIN dealers d ON da.dealer_id = d.id
+      JOIN service_booking sb ON csp.service_booking_id = sb.id
+      WHERE csp.customer_id = ?
+    `;
+
+    const [results] = await pool.query(query, [customerId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No service details found for this customer' });
+    }
+
+    res.status(200).json(results);
+    
+  } catch (err) {
+    console.error("❌ Error fetching customer service details:", err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+});
+
+
+// Route to confirm service completion
+router.put('/confirm-service/:id', authenticateCustomer, async (req, res) => {
+  try {
+    const customerId = req.customer.id;
+    const serviceBookingId = req.params.id;
+
+    // Update status to 'confirmed' for this customer's service booking
+    const [result] = await pool.query(`
+      UPDATE customer_service_payment
+      SET status = 'confirmed'
+      WHERE service_booking_id = ? AND customer_id = ?`,
+      [serviceBookingId, customerId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ 
+        message: 'Service booking not found or not authorized to confirm this service' 
+      });
+    }
+
+    res.status(200).json({ message: 'Service confirmed successfully' });
+  } catch (err) {
+    console.error("❌ Error confirming service:", err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+});
+
+
+// Route to fetch feedback replies for the logged-in customer
+router.get('/customer-feedback-replies', authenticateCustomer, async (req, res) => {
+  try {
+    const customerId = req.customer.id; // Logged-in customer's ID
+
+    // Fetch feedback details along with the dealer's reply
+    const query = `
+      SELECT 
+        f.feedback_id,
+        f.message AS feedback_message,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+        CONCAT(d.first_name, ' ', d.last_name) AS dealer_name,
+        f.reply AS dealer_reply,
+        f.reply_by,
+        f.reply_time,
+        f.status
+      FROM feedback f
+      LEFT JOIN customers c ON f.customer_id = c.id
+      LEFT JOIN dealers d ON f.dealer_id = d.id
+      WHERE f.customer_id = ?
+    `;
+
+    const [results] = await pool.query(query, [customerId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No feedback found for this customer' });
+    }
+
+    res.status(200).json(results);
+    
+  } catch (err) {
+    console.error("❌ Error fetching customer feedback replies:", err);
+    res.status(500).json({ message: 'Database error', error: err });
+  }
+});
+
+
 module.exports = router;

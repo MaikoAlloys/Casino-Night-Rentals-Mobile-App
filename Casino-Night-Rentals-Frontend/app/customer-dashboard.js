@@ -227,7 +227,7 @@ export default function CustomerDashboard() {
                         <Text style={styles.closeText}>✖</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.sidebarMenu}>
+                <ScrollView contentContainerStyle={styles.sidebarMenu}>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-dashboard"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Home</Text>
                     </TouchableOpacity>
@@ -249,6 +249,12 @@ export default function CustomerDashboard() {
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-service-quotation"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Service Quotations</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-service-receipts"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Service Receipts</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-feedback"); toggleSidebar(); }}>
+                        <Text style={styles.navItem}>Feedback</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/help"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Help</Text>
                     </TouchableOpacity>
@@ -264,9 +270,8 @@ export default function CustomerDashboard() {
                     }}>
                         <Text style={styles.navItem}>Logout</Text>
                     </TouchableOpacity>
-                </View>
+                </ScrollView>
             </Animated.View>
-
             {/* Main Content */}
             <View style={styles.mainContent}>
                 <View style={styles.header}>
