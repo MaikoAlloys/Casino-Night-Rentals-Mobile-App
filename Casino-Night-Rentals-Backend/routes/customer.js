@@ -389,6 +389,7 @@ router.get('/customer-service-details', authenticateCustomer, async (req, res) =
     const query = `
       SELECT 
         csp.id AS payment_id,
+        csp.service_booking_id,  
         CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
         s.name AS service_name,
         csp.total_cost,
@@ -420,7 +421,6 @@ router.get('/customer-service-details', authenticateCustomer, async (req, res) =
     res.status(500).json({ message: 'Database error', error: err });
   }
 });
-
 
 // Route to confirm service completion
 router.put('/confirm-service/:id', authenticateCustomer, async (req, res) => {

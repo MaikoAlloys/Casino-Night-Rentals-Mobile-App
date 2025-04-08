@@ -156,6 +156,30 @@ const StorekeeperDashboard = () => {
             <MaterialIcons name="inventory" size={20} color="#3498db" />
             <Text style={styles.navItem}>Service Material Requests</Text>
           </TouchableOpacity>
+
+
+          <TouchableOpacity 
+            style={styles.navButton}
+            onPress={() => { 
+              router.push("/storekeeper-supply-material-requests"); 
+              toggleSidebar(); 
+            }}
+          >
+            <MaterialIcons name="inventory" size={20} color="#3498db" />
+            <Text style={styles.navItem}>Request Materials from supplier</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.navButton}
+            onPress={() => { 
+              router.push("/storekeeper-supply-material-receive"); 
+              toggleSidebar(); 
+            }}
+          >
+            <MaterialIcons name="inventory" size={20} color="#3498db" />
+            <Text style={styles.navItem}>Receive Materials from supplier</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity 
             style={styles.navButton}
             onPress={handleLogout}

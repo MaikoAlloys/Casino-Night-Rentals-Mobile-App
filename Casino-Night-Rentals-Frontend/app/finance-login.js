@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import { useRouter } from "expo-router"; // Importing useRouter for navigation
-import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage for storing token
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./api";
 
 export default function FinanceLogin() {
@@ -16,32 +16,18 @@ export default function FinanceLogin() {
     }
 
     try {
-      // Make POST request to the finance login API
-      const response = await fetch("http://192.168.100.25:5000/finance/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await api.post("/finance/login", { username, password });
 
-      const data = await response.json();
-
-      // Check if the response was successful
-      if (!response.ok) {
-        Alert.alert("Login Failed", data.message || "Something went wrong.");
-        return;
+      if (response.data && response.data.user) {
+        await AsyncStorage.setItem("financeUser", JSON.stringify(response.data.user));
+        Alert.alert("Success", "Login Successful!");
+        router.push("/finance-dashboard");
+      } else {
+        Alert.alert("Login Failed", response.data?.message || "Something went wrong.");
       }
-
-      // If login is successful, store the data in AsyncStorage
-      await AsyncStorage.setItem("financeUser", JSON.stringify(data.user));
-
-      Alert.alert("Success", "Login Successful!");
-
-      // Push to the finance dashboard screen
-      router.push("/finance-dashboard");
-
     } catch (error) {
       console.error("Error during login:", error);
-      Alert.alert("Error", "Network error, please try again.");
+      Alert.alert("Error", error.response?.data?.message || "Network error, please try again.");
     }
   };
 

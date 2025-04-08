@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from './api';
 
 export default function CustomerLogin() {
   const router = useRouter();
@@ -15,31 +16,28 @@ export default function CustomerLogin() {
     }
 
     try {
-      const response = await fetch("http://192.168.100.25:5000/customer/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+      const response = await api.post("/customer/login", {
+        username,
+        password
       });
 
-      const data = await response.json();
+      if (response.data && response.data.token) {
+        await AsyncStorage.setItem("customerToken", response.data.token);
+        await AsyncStorage.setItem("customerId", response.data.customer.id.toString());
 
-      if (!response.ok) {
-        Alert.alert("Login Failed", data.message || "Something went wrong.");
-        return;
+        Alert.alert("Success", "Login Successful!");
+        console.log("User ID:", response.data.customer.id);
+        console.log("Token Stored:", response.data.token);
+
+        router.push("/customer-dashboard");
+      } else {
+        throw new Error("Invalid response from server");
       }
-
-      await AsyncStorage.setItem("customerToken", data.token);
-      await AsyncStorage.setItem("customerId", data.customer.id.toString());
-
-      Alert.alert("Success", "Login Successful!");
-      console.log("User ID:", data.customer.id);
-      console.log("Token Stored:", data.token);
-
-      router.push("/customer-dashboard");
 
     } catch (error) {
       console.error("Error during login:", error);
-      Alert.alert("Error", "Network error, please try again.");
+      const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
+      Alert.alert("Error", errorMessage);
     }
   };
 

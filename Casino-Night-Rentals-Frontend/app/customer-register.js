@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
+import api from './api';
 
 export default function CustomerRegister() {
   const router = useRouter();
@@ -35,24 +36,18 @@ export default function CustomerRegister() {
     }
 
     try {
-      const response = await fetch("http://192.168.100.25:5000/customer/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const response = await api.post("/customer/register", form);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        Alert.alert("Registration Failed", data.error);
-        return;
+      if (response.data) {
+        Alert.alert("Success", "Registration successful! Await admin approval.");
+        router.push("/customer-login");
+      } else {
+        throw new Error("Registration failed");
       }
 
-      Alert.alert("Success", "Registration successful! Await admin approval.");
-      router.push("/customer-login");
-
     } catch (error) {
-      Alert.alert("Error", "Network error, please try again.");
+      const errorMessage = error.response?.data?.error || "Network error, please try again.";
+      Alert.alert("Error", errorMessage);
     }
   };
 

@@ -304,4 +304,123 @@ router.post("/approve-customer-service-payment", async (req, res) => {
     }
 });
 
+
+// Endpoint for finance to fetch items to pay supplier
+// Endpoint for finance to fetch items to pay supplier
+router.get('/fetch-items-to-pay', async (req, res) => {
+    try {
+      // Fetch item details where the status is "received"
+      const [itemDetails] = await pool.query(`
+        SELECT
+          ssi.id AS storekeeper_selected_item_id,
+          ssi.quantity,
+          ssi.total_cost,
+          ROUND(ssi.total_cost * ssi.quantity, 2) AS grand_total,
+          sup.id AS supplier_id,
+          CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,
+          COALESCE(p.name, si.item_name) AS item_name
+        FROM storekeeper_selected_items ssi
+        JOIN suppliers sup ON ssi.supplier_id = sup.id
+        LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
+        LEFT JOIN store_items si ON ssi.item_type = 'service' AND ssi.item_id = si.id
+        WHERE ssi.status = 'received'
+      `);
+  
+      if (!itemDetails.length) {
+        return res.status(404).json({ success: false, message: 'No items found with received status' });
+      }
+  
+      // Ensure grand_total is returned as a proper number
+      itemDetails.forEach(item => {
+        item.grand_total = parseFloat(item.grand_total); // Ensure grand_total is a float number
+      });
+  
+      // Return the fetched items as a response
+      return res.status(200).json({
+        success: true,
+        data: itemDetails
+      });
+  
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+  
+  //paying supplier
+  // Endpoint for finance to make a payment to supplier
+router.post('/pay-supplier', async (req, res) => {
+    const { payment_method, reference_code, paid_amount, storekeeper_selected_item_id } = req.body;
+  
+    // Validate input fields
+    if (!payment_method || !reference_code || !paid_amount || !storekeeper_selected_item_id) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+  
+    // Validate the reference code based on payment method
+    const referenceCodeRegex = payment_method === 'mpesa' ? /^[A-Za-z0-9]{10}$/ : /^[A-Za-z0-9]{14}$/;
+    if (!referenceCodeRegex.test(reference_code)) {
+      return res.status(400).json({ success: false, message: `Invalid reference code for ${payment_method}` });
+    }
+  
+    try {
+      // Start a transaction to ensure both the payment insertion and the status update are done atomically
+      await pool.query('START TRANSACTION');
+  
+      // Insert the payment data into the supplier_payments table
+      const [result] = await pool.query(`
+        INSERT INTO supplier_payments (
+          payment_method,
+          status,
+          reference_code,
+          supplier_id,
+          storekeeper_selected_item_id,
+          paid_amount
+        ) 
+        SELECT
+          ? AS payment_method,
+          'pending' AS status,
+          ? AS reference_code,
+          ssi.supplier_id,
+          ? AS storekeeper_selected_item_id,
+          ? AS paid_amount
+        FROM storekeeper_selected_items ssi
+        WHERE ssi.id = ?
+      `, [payment_method, reference_code, storekeeper_selected_item_id, paid_amount, storekeeper_selected_item_id]);
+  
+      // If no rows are affected, something went wrong
+      if (result.affectedRows === 0) {
+        await pool.query('ROLLBACK'); // Rollback transaction if no rows affected
+        return res.status(404).json({ success: false, message: 'Storekeeper item not found' });
+      }
+  
+      // Update the status in storekeeper_selected_items to 'paid' from 'received'
+      const [updateResult] = await pool.query(`
+        UPDATE storekeeper_selected_items
+        SET status = 'paid'
+        WHERE id = ? AND status = 'received'
+      `, [storekeeper_selected_item_id]);
+  
+      // If no rows are updated, something went wrong
+      if (updateResult.affectedRows === 0) {
+        await pool.query('ROLLBACK'); // Rollback transaction if update fails
+        return res.status(400).json({ success: false, message: 'Failed to update status to paid' });
+      }
+  
+      // Commit the transaction
+      await pool.query('COMMIT');
+  
+      // Return success response
+      return res.status(200).json({
+        success: true,
+        message: 'Payment recorded and status updated to paid successfully'
+      });
+  
+    } catch (error) {
+      console.error(error);
+      await pool.query('ROLLBACK'); // Rollback transaction in case of any error
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+  
 module.exports = router;

@@ -66,6 +66,7 @@ const CustomerServiceReceipts = () => {
         const formattedServices = response.data.map((item, index) => ({
           ...item,
           id: item.payment_id,
+          serviceBookingId: item.service_booking_id,
           tempId: index.toString(),
           formattedDate: formatDate(item.event_date),
           status: item.payment_status || 'pending'
@@ -125,16 +126,16 @@ const CustomerServiceReceipts = () => {
     }
   };
 
-  const handleConfirmService = async (paymentId) => {
+  const handleConfirmService = async (serviceBookingId) => {
     try {
       const token = await AsyncStorage.getItem("customerToken");
-      await api.put(`/customer/confirm-service/${paymentId}`, {}, {
+      await api.put(`/customer/confirm-service/${serviceBookingId}`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
       Alert.alert("Success", "Service confirmed successfully!");
       setServices(services.map(service => 
-        service.id === paymentId ? { ...service, status: 'confirmed' } : service
+        service.serviceBookingId === serviceBookingId ? { ...service, status: 'confirmed' } : service
       ));
     } catch (error) {
       console.error("Error confirming service:", error);
@@ -207,7 +208,7 @@ const CustomerServiceReceipts = () => {
       await Share.share({
         url: uri,
         title: 'Service Receipt',
-        message: `Here's my service receipt for ${services[tempId].service_name}`,
+        message: `Here's my service receipt for ${services.find(s => s.tempId === tempId)?.service_name}`,
       });
     } catch (error) {
       console.error("Error sharing receipt:", error);
@@ -293,7 +294,7 @@ const CustomerServiceReceipts = () => {
             <View 
               ref={ref => receiptRefs.current[item.tempId] = ref}
               style={styles.receiptContent}
-              collapsable={false}  // This is important for view capturing
+              collapsable={false}
             >
               <View style={styles.receiptHeader}>
                 <Text style={styles.receiptTitle}>Service Receipt</Text>
@@ -385,7 +386,7 @@ const CustomerServiceReceipts = () => {
               {item.status.toLowerCase() === 'completed' && (
                 <TouchableOpacity 
                   style={[styles.actionButton, { backgroundColor: '#52c41a' }]}
-                  onPress={() => handleConfirmService(item.id)}
+                  onPress={() => handleConfirmService(item.serviceBookingId)}
                 >
                   <Icon name="checkcircleo" size={20} color="#fff" />
                   <Text style={styles.actionButtonText}>Confirm Completion</Text>
@@ -408,6 +409,8 @@ const CustomerServiceReceipts = () => {
   );
 };
 
+
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,

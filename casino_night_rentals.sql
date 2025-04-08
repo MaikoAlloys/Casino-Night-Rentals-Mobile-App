@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 07, 2025 at 08:36 PM
+-- Generation Time: Apr 08, 2025 at 09:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -59,7 +59,8 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`, `is_approved`) VALUES
 (1, 'Phoebe', 'Phoebe', 'Siaka', 'maikoa052@gmail.com', '0796901211', '$2b$10$R42J8jpyZWiZLUG2rHqyY.z9GWAB2Fl.7gqK09iq8RWAdrJqG71qG', '2025-04-02 17:16:49', 1),
-(2, 'Alex', 'Alex', 'Maiko', 'maiko052@gmail.com', '0796901210', '$2b$10$VEDERi4lFAM.KDyEGN..9.wTbaUjn/UI4MsIjEvA/uS88a9tFUawO', '2025-04-02 17:31:36', 1);
+(2, 'Alex', 'Alex', 'Maiko', 'maiko052@gmail.com', '0796901210', '$2b$10$VEDERi4lFAM.KDyEGN..9.wTbaUjn/UI4MsIjEvA/uS88a9tFUawO', '2025-04-02 17:31:36', 1),
+(3, 'Sammy', 'Sammy', 'Mwangi ', 'maikoaalloys@gmail.com', '0796901230', '$2b$10$MB6X0.5ChKbnl59ZHu0liOp4pQrXNcHsrQhuUboy5sx8PZFJGFByC', '2025-04-08 06:21:06', 1);
 
 -- --------------------------------------------------------
 
@@ -85,7 +86,8 @@ CREATE TABLE `customer_service_payment` (
 
 INSERT INTO `customer_service_payment` (`id`, `total_cost`, `customer_id`, `service_id`, `service_booking_id`, `payment_method`, `reference_code`, `status`, `created_at`) VALUES
 (3, 430.00, 2, 4, 3, 'bank', 'WWASRETG34CVGD', 'confirmed', '2025-04-06 15:33:16'),
-(4, 1220.00, 2, 3, 10, 'mpesa', 'QWERTY4564', 'confirmed', '2025-04-07 05:26:26');
+(4, 1220.00, 2, 3, 10, 'mpesa', 'QWERTY4564', 'confirmed', '2025-04-07 05:26:26'),
+(5, 1300.00, 3, 5, 11, 'mpesa', 'QWERTDS321', 'confirmed', '2025-04-08 06:39:07');
 
 -- --------------------------------------------------------
 
@@ -137,7 +139,8 @@ INSERT INTO `dealer_assignments` (`id`, `service_booking_id`, `dealer_id`, `assi
 (10, 2, 2, '2025-04-05 16:15:31', 1, 50, 'submitted'),
 (11, 7, 2, '2025-04-06 06:15:06', 1, 27, 'submitted'),
 (12, 3, 1, '2025-04-06 06:53:26', 4, 10, 'submitted'),
-(13, 10, 3, '2025-04-06 15:52:13', 3, 2, 'submitted');
+(13, 10, 3, '2025-04-06 15:52:13', 3, 2, 'submitted'),
+(14, 11, 3, '2025-04-08 06:35:37', 5, 10, 'submitted');
 
 -- --------------------------------------------------------
 
@@ -167,7 +170,9 @@ INSERT INTO `dealer_selected_items` (`id`, `store_item_id`, `service_id`, `deale
 (28, 17, 4, 1, 2, 150.00, 1, 'approved', '2025-04-06 13:29:06', 3),
 (29, 19, 4, 1, 2, 100.00, 1, 'approved', '2025-04-06 13:29:06', 3),
 (30, 12, 3, 3, 2, 100.00, 1, 'approved', '2025-04-06 15:52:45', 10),
-(31, 14, 3, 3, 2, 80.00, 14, 'approved', '2025-04-06 15:52:45', 10);
+(31, 14, 3, 3, 2, 80.00, 14, 'approved', '2025-04-06 15:52:45', 10),
+(32, 23, 5, 3, 3, 70.00, 10, 'approved', '2025-04-08 06:37:48', 11),
+(33, 21, 5, 3, 3, 60.00, 10, 'approved', '2025-04-08 06:37:48', 11);
 
 -- --------------------------------------------------------
 
@@ -217,7 +222,8 @@ INSERT INTO `event_product_booking` (`id`, `customer_id`, `product_id`, `status`
 (4, 1, 2, 'confirmed', '2025-04-04 12:30:07', 14),
 (5, 1, 3, 'confirmed', '2025-04-04 12:30:07', 14),
 (7, 1, 3, 'reserved', '2025-04-04 12:30:10', 15),
-(8, 1, 1, 'reserved', '2025-04-04 15:19:34', 13);
+(8, 1, 1, 'reserved', '2025-04-04 15:19:34', 13),
+(9, 3, 3, 'confirmed', '2025-04-08 06:29:04', 17);
 
 -- --------------------------------------------------------
 
@@ -246,7 +252,8 @@ CREATE TABLE `feedback` (
 --
 
 INSERT INTO `feedback` (`feedback_id`, `customer_id`, `dealer_id`, `service_manager_id`, `finance_id`, `event_manager_id`, `message`, `rating`, `created_at`, `status`, `reply`, `reply_by`, `reply_time`) VALUES
-(7, 1, 1, NULL, NULL, NULL, 'Sasa Nyangweso', 3, '2025-04-07 18:32:50', 'resolved', 'Niaje Nyasuguta!', 'Dealer 1', '2025-04-07 18:33:50');
+(7, 1, 1, NULL, NULL, NULL, 'Sasa Nyangweso', 3, '2025-04-07 18:32:50', 'resolved', 'Niaje Nyasuguta!', 'Dealer 1', '2025-04-07 18:33:50'),
+(8, 3, 2, NULL, NULL, NULL, 'Thanks ', 4, '2025-04-08 07:49:48', 'resolved', 'Welcome ', 'Dealer 2', '2025-04-08 07:50:14');
 
 -- --------------------------------------------------------
 
@@ -310,7 +317,8 @@ INSERT INTO `order_items` (`id`, `payment_id`, `product_id`, `quantity`) VALUES
 (10, 14, 2, 2),
 (11, 14, 3, 1),
 (12, 15, 3, 1),
-(13, 16, 3, 1);
+(13, 16, 3, 1),
+(14, 17, 3, 5);
 
 -- --------------------------------------------------------
 
@@ -336,7 +344,8 @@ INSERT INTO `payments` (`id`, `reference_code`, `customer_id`, `payment_method`,
 (13, 'QWERF34FDRE214', 1, 'bank', 'approved', 2000.00, '2025-04-03 17:56:27'),
 (14, 'QWERTFD234', 1, 'mpesa', 'approved', 3900.00, '2025-04-03 17:59:25'),
 (15, 'QWERTFRD32', 1, 'mpesa', 'approved', 1500.00, '2025-04-03 18:00:59'),
-(16, 'QWERTY32QW', 2, 'mpesa', 'approved', 1500.00, '2025-04-03 18:05:56');
+(16, 'QWERTY32QW', 2, 'mpesa', 'approved', 1500.00, '2025-04-03 18:05:56'),
+(17, 'QWERTYF232', 3, 'mpesa', 'approved', 7500.00, '2025-04-08 06:25:20');
 
 -- --------------------------------------------------------
 
@@ -349,17 +358,18 @@ CREATE TABLE `products` (
   `name` varchar(100) NOT NULL,
   `quantity` int(11) NOT NULL,
   `rental_price` decimal(10,2) NOT NULL,
-  `image_url` varchar(255) DEFAULT NULL
+  `image_url` varchar(255) DEFAULT NULL,
+  `total_cost` decimal(10,2) NOT NULL DEFAULT 13000.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `quantity`, `rental_price`, `image_url`) VALUES
-(1, 'L.E.D ROULETTE TABLE\r\n', 48, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg'),
-(2, 'L.E.D BLACKJACK TABLE', 98, 1200.00, 'https://cocoeventsnyc.com/wp-content/uploads/2023/04/light-up-black-jack-3.jpg'),
-(3, 'POKER TABLE', 97, 1500.00, 'https://m.media-amazon.com/images/I/61irFiMDcFL._AC_SL1500_.jpg');
+INSERT INTO `products` (`id`, `name`, `quantity`, `rental_price`, `image_url`, `total_cost`) VALUES
+(1, 'L.E.D ROULETTE TABLE\r\n', 53, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', 13000.00),
+(2, 'L.E.D BLACKJACK TABLE', 98, 1200.00, 'https://cocoeventsnyc.com/wp-content/uploads/2023/04/light-up-black-jack-3.jpg', 13000.00),
+(3, 'POKER TABLE', 92, 1500.00, 'https://m.media-amazon.com/images/I/61irFiMDcFL._AC_SL1500_.jpg', 13000.00);
 
 -- --------------------------------------------------------
 
@@ -443,7 +453,8 @@ INSERT INTO `service_booking` (`id`, `customer_id`, `service_id`, `event_date`, 
 (7, 1, 1, '0000-00-00', 27, 200.00, 'mpesa', 'QWE54FGTRD', 'assigned', '2025-04-05 07:29:23'),
 (8, 1, 1, '2025-04-07', 15, 200.00, 'mpesa', 'QWERFYGFD4', 'pending', '2025-04-05 07:34:08'),
 (9, 1, 1, '2025-05-10', 99, 200.00, 'mpesa', 'QWED34ERF3', 'assigned', '2025-04-05 07:48:40'),
-(10, 2, 3, '2025-07-10', 2, 200.00, 'mpesa', 'QWEDRFT542', 'assigned', '2025-04-06 15:48:52');
+(10, 2, 3, '2025-07-10', 2, 200.00, 'mpesa', 'QWEDRFT542', 'assigned', '2025-04-06 15:48:52'),
+(11, 3, 5, '2025-04-09', 10, 200.00, 'mpesa', 'QWERTDF432', 'assigned', '2025-04-08 06:32:49');
 
 -- --------------------------------------------------------
 
@@ -496,6 +507,32 @@ INSERT INTO `storekeeper` (`id`, `username`, `first_name`, `last_name`, `email`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `storekeeper_selected_items`
+--
+
+CREATE TABLE `storekeeper_selected_items` (
+  `id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `item_type` enum('product','service') NOT NULL,
+  `supplier_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `total_cost` decimal(10,2) NOT NULL,
+  `status` enum('pending','approved','received','paid') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `storekeeper_selected_items`
+--
+
+INSERT INTO `storekeeper_selected_items` (`id`, `item_id`, `item_type`, `supplier_id`, `quantity`, `total_cost`, `status`, `created_at`) VALUES
+(1, 1, 'product', 2, 5, 1000.00, 'paid', '2025-04-08 11:12:31'),
+(2, 3, 'service', 1, 2, 144.00, 'approved', '2025-04-08 11:36:31'),
+(3, 30, 'service', 1, 3, 243.00, 'received', '2025-04-08 11:36:31');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `store_items`
 --
 
@@ -533,21 +570,71 @@ INSERT INTO `store_items` (`id`, `service_id`, `item_name`, `item_cost_per_perso
 (18, 4, 'Buffet Catering', 300.00, 100, '2025-04-06 06:25:22'),
 (19, 4, 'Decor & Lighting', 100.00, 97, '2025-04-06 06:25:22'),
 (20, 4, 'Photo Booth Setup', 90.00, 100, '2025-04-06 06:25:22'),
-(21, 5, 'Card & Board Games', 60.00, 100, '2025-04-06 06:25:22'),
+(21, 5, 'Card & Board Games', 60.00, 90, '2025-04-06 06:25:22'),
 (22, 5, 'Game Tables & Chairs', 80.00, 100, '2025-04-06 06:25:22'),
-(23, 5, 'Lighting Setup', 70.00, 100, '2025-04-06 06:25:22'),
+(23, 5, 'Lighting Setup', 70.00, 90, '2025-04-06 06:25:22'),
 (24, 5, 'Snacks & Drinks', 100.00, 100, '2025-04-06 06:25:22'),
 (25, 5, 'MC or Host', 120.00, 100, '2025-04-06 06:25:22'),
 (26, 6, 'Basic Seating Setup', 60.00, 100, '2025-04-06 06:25:22'),
 (27, 6, 'Light Meals & Refreshments', 150.00, 100, '2025-04-06 06:25:22'),
 (28, 6, 'PA System', 100.00, 100, '2025-04-06 06:25:22'),
 (29, 6, 'Decorations', 80.00, 100, '2025-04-06 06:25:22'),
-(30, 6, 'Games & Icebreakers', 90.00, 100, '2025-04-06 06:25:22'),
+(30, 6, 'Games & Icebreakers', 90.00, 103, '2025-04-06 06:25:22'),
 (31, 7, 'Display Booths', 140.00, 100, '2025-04-06 06:25:22'),
 (32, 7, 'Stage Lighting', 130.00, 100, '2025-04-06 06:25:22'),
 (33, 7, 'Brochure Printing', 60.00, 100, '2025-04-06 06:25:22'),
 (34, 7, 'Host/Presenter', 100.00, 100, '2025-04-06 06:25:22'),
 (35, 7, 'Catering & Drinks', 220.00, 100, '2025-04-06 06:25:22');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `suppliers`
+--
+
+CREATE TABLE `suppliers` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `suppliers`
+--
+
+INSERT INTO `suppliers` (`id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `password`, `created_at`) VALUES
+(1, 'Danstan', 'Danstan', 'Mwangi', 'danstan.mwangi@gmail.com', '0712345678', '$2b$10$gJOGr1X5IO74fnvV5GU4g.aeq3IQNmDccJxppvDXbX1PhMLyN9R5m', '2025-04-08 05:59:31'),
+(2, 'Victor', 'Victor', 'Mwendwa', 'victor.mwendwa@gmail.com', '0723456789', '$2b$10$CTgmAMKqyL2u/0La0Guep.Cadg3L3YAZGHL3pqxK1NlDM3NtvU12i', '2025-04-08 05:59:31'),
+(3, 'Cynthia', 'Cynthia', 'Njeri', 'cynthia.njeri@gmail.com', '0734567890', '$2b$10$b2PlkGCYGkOacBQ8dWYdOO27wK/KI.a291/RO6YYCGQDh0Rw0lXOm', '2025-04-08 05:59:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `supplier_payments`
+--
+
+CREATE TABLE `supplier_payments` (
+  `id` int(11) NOT NULL,
+  `payment_method` enum('mpesa','bank') NOT NULL,
+  `status` enum('pending','approved') DEFAULT 'pending',
+  `reference_code` varchar(50) NOT NULL,
+  `supplier_id` int(11) NOT NULL,
+  `storekeeper_selected_item_id` int(11) NOT NULL,
+  `paid_amount` decimal(10,2) NOT NULL,
+  `payment_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `supplier_payments`
+--
+
+INSERT INTO `supplier_payments` (`id`, `payment_method`, `status`, `reference_code`, `supplier_id`, `storekeeper_selected_item_id`, `paid_amount`, `payment_date`) VALUES
+(6, 'mpesa', 'approved', '1234567897', 2, 1, 5000.00, '2025-04-08 18:18:02');
 
 --
 -- Indexes for dumped tables
@@ -705,11 +792,32 @@ ALTER TABLE `storekeeper`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `storekeeper_selected_items`
+--
+ALTER TABLE `storekeeper_selected_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_supplier` (`supplier_id`);
+
+--
 -- Indexes for table `store_items`
 --
 ALTER TABLE `store_items`
   ADD PRIMARY KEY (`id`),
   ADD KEY `service_id` (`service_id`);
+
+--
+-- Indexes for table `suppliers`
+--
+ALTER TABLE `suppliers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `supplier_payments`
+--
+ALTER TABLE `supplier_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `supplier_id` (`supplier_id`),
+  ADD KEY `storekeeper_selected_item_id` (`storekeeper_selected_item_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -725,13 +833,13 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `customer_service_payment`
 --
 ALTER TABLE `customer_service_payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `dealers`
@@ -743,13 +851,13 @@ ALTER TABLE `dealers`
 -- AUTO_INCREMENT for table `dealer_assignments`
 --
 ALTER TABLE `dealer_assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `dealer_selected_items`
 --
 ALTER TABLE `dealer_selected_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `event_manager`
@@ -761,13 +869,13 @@ ALTER TABLE `event_manager`
 -- AUTO_INCREMENT for table `event_product_booking`
 --
 ALTER TABLE `event_product_booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `finance`
@@ -785,13 +893,13 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -803,7 +911,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_cart`
 --
 ALTER TABLE `product_cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -815,7 +923,7 @@ ALTER TABLE `services`
 -- AUTO_INCREMENT for table `service_booking`
 --
 ALTER TABLE `service_booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `service_manager`
@@ -830,10 +938,28 @@ ALTER TABLE `storekeeper`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `storekeeper_selected_items`
+--
+ALTER TABLE `storekeeper_selected_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `store_items`
 --
 ALTER TABLE `store_items`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `suppliers`
+--
+ALTER TABLE `suppliers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `supplier_payments`
+--
+ALTER TABLE `supplier_payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -925,10 +1051,23 @@ ALTER TABLE `service_booking`
   ADD CONSTRAINT `service_booking_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`);
 
 --
+-- Constraints for table `storekeeper_selected_items`
+--
+ALTER TABLE `storekeeper_selected_items`
+  ADD CONSTRAINT `fk_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`);
+
+--
 -- Constraints for table `store_items`
 --
 ALTER TABLE `store_items`
   ADD CONSTRAINT `store_items_ibfk_1` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `supplier_payments`
+--
+ALTER TABLE `supplier_payments`
+  ADD CONSTRAINT `supplier_payments_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`),
+  ADD CONSTRAINT `supplier_payments_ibfk_2` FOREIGN KEY (`storekeeper_selected_item_id`) REFERENCES `storekeeper_selected_items` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

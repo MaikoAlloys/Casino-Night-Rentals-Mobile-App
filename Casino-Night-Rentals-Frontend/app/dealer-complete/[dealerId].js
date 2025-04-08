@@ -41,13 +41,13 @@ const DealerCompletedServices = () => {
         }
     };
 
-    const completeService = async (paymentId) => {
+    const completeService = async (serviceBookingId) => {
         try {
-            setCompletingIds(prev => [...prev, paymentId]);
+            setCompletingIds(prev => [...prev, serviceBookingId]);
             
             const response = await api.post("/dealers/update-status-to-completed", {
                 dealer_id: dealerId,
-                payment_id: paymentId
+                service_booking_id: serviceBookingId
             });
             
             if (response.data?.success) {
@@ -60,7 +60,7 @@ const DealerCompletedServices = () => {
             console.error("Error completing service:", error);
             Alert.alert("Error", error.message || "Failed to complete service");
         } finally {
-            setCompletingIds(prev => prev.filter(id => id !== paymentId));
+            setCompletingIds(prev => prev.filter(id => id !== serviceBookingId));
         }
     };
 

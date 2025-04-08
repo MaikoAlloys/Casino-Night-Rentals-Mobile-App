@@ -209,4 +209,187 @@ router.put("/release-items/:serviceBookingId", async (req, res) => {
   }
 });
 
+// GET /storekeeper/items
+// GET /storekeeper/items
+router.get('/items', async (req, res) => {
+  try {
+    const [products] = await pool.query(`
+      SELECT 
+        id, 
+        name, 
+        'product' AS item_type,
+        ROUND(total_cost * 0.9, 2) AS discounted_cost
+      FROM products
+    `);
+
+    const [services] = await pool.query(`
+      SELECT 
+        id, 
+        item_name AS name, 
+        'service' AS item_type,
+        ROUND(item_cost_per_person * 0.9, 2) AS discounted_cost
+      FROM store_items
+    `);
+
+    // Ensuring the discounted_cost is returned as a number (parseFloat ensures this)
+    const combinedItems = [
+      ...products.map(item => ({
+        ...item,
+        discounted_cost: parseFloat(item.discounted_cost) // Ensure it is a number
+      })),
+      ...services.map(item => ({
+        ...item,
+        discounted_cost: parseFloat(item.discounted_cost) // Ensure it is a number
+      }))
+    ];
+
+    res.json(combinedItems);
+  } catch (error) {
+    console.error('Error fetching storekeeper items:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Insert selected item
+router.post('/selected-items', async (req, res) => {
+  const { item_id, item_type, supplier_id, quantity, total_cost } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO storekeeper_selected_items 
+      (item_id, item_type, supplier_id, quantity, total_cost, status) 
+      VALUES (?, ?, ?, ?, ?, 'pending')
+    `;
+    const values = [item_id, item_type, supplier_id, quantity, total_cost];
+
+    await pool.query(query, values);
+    res.status(201).json({ message: 'Item inserted successfully.' });
+  } catch (error) {
+    console.error('Insert error:', error);
+    res.status(500).json({ message: 'Failed to insert item.' });
+  }
+});
+
+
+// Fetch suppliers (id and full name)
+router.get('/suppliers', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT id, CONCAT(first_name, ' ', last_name) AS full_name
+      FROM suppliers
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching suppliers:', error);
+    res.status(500).json({ message: 'Failed to fetch suppliers.' });
+  }
+});
+
+//fetching approved items by supplier
+router.get('/approved-items', async (req, res) => {
+  try {
+    const [results] = await pool.query(`
+      SELECT 
+        ssi.id,
+        ssi.item_type,
+        ssi.quantity,
+        ssi.total_cost,
+        ssi.status,
+        ssi.created_at,
+        CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_name,
+        COALESCE(p.name, si.item_name) AS item_name,
+        -- Calculate grand total as total_cost * quantity and ensure it returns as a float
+        CAST(ssi.total_cost * ssi.quantity AS DECIMAL(10,2)) AS grand_total
+      FROM storekeeper_selected_items ssi
+      JOIN suppliers sup ON ssi.supplier_id = sup.id
+      LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
+      LEFT JOIN store_items si ON ssi.item_type = 'service' AND ssi.item_id = si.id
+      WHERE ssi.status = 'approved'
+      ORDER BY ssi.created_at DESC
+    `);
+
+    // Format the result to include the grand_total as a float
+    const formattedResults = results.map(item => ({
+      ...item,
+      grand_total: parseFloat(item.grand_total), // Ensure grand_total is a float
+    }));
+
+    res.json({ success: true, data: formattedResults });
+  } catch (error) {
+    console.error('Error fetching approved items:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+});
+
+
+
+// routes/storekeeper.js (or your relevant file)
+router.put('/mark-received/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Get item data first
+    const [rows] = await pool.query(
+      `SELECT item_id, item_type, quantity, status 
+       FROM storekeeper_selected_items 
+       WHERE id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
+    }
+
+    const item = rows[0];
+
+    if (item.status !== 'approved') {
+      return res.status(400).json({ success: false, message: 'Item must be approved first' });
+    }
+
+    // Update status to received
+    const [updateResult] = await pool.query(
+      `UPDATE storekeeper_selected_items 
+       SET status = 'received' 
+       WHERE id = ? AND status = 'approved'`,
+      [id]
+    );
+
+    if (updateResult.affectedRows === 0) {
+      return res.status(400).json({ success: false, message: 'Failed to update item status' });
+    }
+
+    // Add quantity to products or store_items
+    if (item.item_type === 'product') {
+      await pool.query(
+        `UPDATE products 
+         SET quantity = quantity + ? 
+         WHERE id = ?`,
+        [item.quantity, item.item_id]
+      );
+    } else if (item.item_type === 'service') {
+      await pool.query(
+        `UPDATE store_items 
+         SET quantity = quantity + ? 
+         WHERE id = ?`,
+        [item.quantity, item.item_id]
+      );
+    }
+
+    res.json({ success: true, message: 'Item marked as received and quantity updated' });
+
+  } catch (error) {
+    console.error('Error marking item as received:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

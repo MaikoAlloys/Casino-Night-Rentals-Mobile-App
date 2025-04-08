@@ -289,33 +289,33 @@ router.get("/customer-service-details/:dealerId", async (req, res) => {
 //completing service
 // POST /update-status-to-completed
 router.post("/update-status-to-completed", async (req, res) => {
-  const { dealer_id, payment_id } = req.body;  // Get dealer_id and payment_id from the request body
-  
-  console.log(`[${new Date().toISOString()}] Dealer ${dealer_id} is updating payment status to 'completed' for paymentId: ${payment_id}`);
-  
-  if (!payment_id || !dealer_id) {
+  const { dealer_id, service_booking_id } = req.body;
+
+  console.log(`[${new Date().toISOString()}] Dealer ${dealer_id} is updating payment status to 'completed' for serviceBookingId: ${service_booking_id}`);
+
+  if (!service_booking_id || !dealer_id) {
     return res.status(400).json({
       success: false,
-      message: 'Payment ID and Dealer ID are required'
+      message: 'Service Booking ID and Dealer ID are required'
     });
   }
 
   try {
-    // Verify the payment exists and its current status is "released"
+    // Check if payment for this booking exists and is in "released" status
     const [paymentCheck] = await pool.query(
-      'SELECT id, status FROM customer_service_payment WHERE id = ? AND status = "released"',
-      [payment_id]
+      'SELECT id, status FROM customer_service_payment WHERE service_booking_id = ? AND status = "released"',
+      [service_booking_id]
     );
 
     if (paymentCheck.length === 0) {
-      console.log(`Payment with ID ${payment_id} not found or not in "released" status`);
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Payment not found or not in "released" status' 
+      console.log(`Payment for service booking ID ${service_booking_id} not found or not in "released" status`);
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found or not in "released" status'
       });
     }
 
-    // Verify the dealer exists (optional)
+    // Optional: Verify dealer exists
     const [dealerCheck] = await pool.query(
       'SELECT id FROM dealers WHERE id = ?',
       [dealer_id]
@@ -323,29 +323,29 @@ router.post("/update-status-to-completed", async (req, res) => {
 
     if (dealerCheck.length === 0) {
       console.log(`Dealer with ID ${dealer_id} not found`);
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Dealer not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Dealer not found'
       });
     }
 
-    // Update the status to "completed"
+    // Update payment status to "completed"
     const [updateResult] = await pool.query(
-      'UPDATE customer_service_payment SET status = "completed" WHERE id = ?',
-      [payment_id]
+      'UPDATE customer_service_payment SET status = "completed" WHERE service_booking_id = ?',
+      [service_booking_id]
     );
 
-    console.log(`Payment status updated to "completed" for paymentId: ${payment_id}`);
+    console.log(`Payment status updated to "completed" for serviceBookingId: ${service_booking_id}`);
 
     res.json({
       success: true,
       message: 'Payment status updated to "completed" successfully',
-      updatedPaymentId: payment_id,  // Return the updated payment ID
-      newStatus: 'completed'  // Return the new status
+      serviceBookingId: service_booking_id,
+      newStatus: 'completed'
     });
 
   } catch (error) {
-    console.error(`Error updating payment status for paymentId ${payment_id}:`, error);
+    console.error(`Error updating payment status for serviceBookingId ${service_booking_id}:`, error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -353,6 +353,7 @@ router.post("/update-status-to-completed", async (req, res) => {
     });
   }
 });
+
 // GET /dealer/feedback/:dealerId
 router.get("/feedback/:dealerId", async (req, res) => {
   const { dealerId } = req.params;
