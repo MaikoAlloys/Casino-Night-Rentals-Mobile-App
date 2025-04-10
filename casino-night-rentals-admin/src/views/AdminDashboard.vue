@@ -84,42 +84,53 @@
       <div class="content">
         <h1>Welcome to the Admin Dashboard</h1>
         <div class="stats-cards">
-          <div class="card">
-            <div class="card-icon blue">
-              <i>👥</i>
+          <router-link to="/product-payment" class="card-link">
+            <div class="card">
+              <div class="card-icon blue">
+                <i></i>
+              </div>
+              <div class="card-content">
+                <h3>Rental Payment</h3>
+                <p>1,248</p>
+              </div>
             </div>
-            <div class="card-content">
-              <h3>Total Customers</h3>
-              <p>1,248</p>
+          </router-link>
+          
+          <router-link to="/service-booking" class="card-link">
+            <div class="card">
+              <div class="card-icon green">
+                <i></i>
+              </div>
+              <div class="card-content">
+                <h3>Service Bookings</h3>
+                <p>56</p>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-icon green">
-              <i>🎰</i>
+          </router-link>
+          
+          <router-link to="/service-payments" class="card-link">
+            <div class="card">
+              <div class="card-icon orange">
+                <i></i>
+              </div>
+              <div class="card-content">
+                <h3>Service Payments</h3>
+                <p>12</p>
+              </div>
             </div>
-            <div class="card-content">
-              <h3>Available Products</h3>
-              <p>56</p>
+          </router-link>
+          
+          <router-link to="/supplier-management" class="card-link">
+            <div class="card">
+              <div class="card-icon red">
+                <i>💬</i>
+              </div>
+              <div class="card-content">
+                <h3>New Feedback</h3>
+                <p>8</p>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-icon orange">
-              <i>📅</i>
-            </div>
-            <div class="card-content">
-              <h3>Upcoming Events</h3>
-              <p>12</p>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-icon red">
-              <i>💬</i>
-            </div>
-            <div class="card-content">
-              <h3>New Feedback</h3>
-              <p>8</p>
-            </div>
-          </div>
+          </router-link>
         </div>
         
         <div class="recent-activity">
@@ -366,6 +377,11 @@ export default {
   margin: 20px 0;
 }
 
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .card {
   background: white;
   border-radius: 8px;
@@ -373,6 +389,13 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .card-icon {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2025 at 02:56 AM
+-- Generation Time: Apr 10, 2025 at 03:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -390,7 +390,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `quantity`, `rental_price`, `image_url`, `total_cost`) VALUES
-(1, 'L.E.D ROULETTE TABLE\r\n', 53, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', 13000.00),
+(1, 'L.E.D ROULETTE TABLE\r\n', 60, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', 13000.00),
 (2, 'L.E.D BLACKJACK TABLE', 98, 1200.00, 'https://cocoeventsnyc.com/wp-content/uploads/2023/04/light-up-black-jack-3.jpg', 13000.00),
 (3, 'POKER TABLE', 92, 1500.00, 'https://m.media-amazon.com/images/I/61irFiMDcFL._AC_SL1500_.jpg', 13000.00);
 
@@ -550,8 +550,12 @@ CREATE TABLE `storekeeper_selected_items` (
 
 INSERT INTO `storekeeper_selected_items` (`id`, `item_id`, `item_type`, `supplier_id`, `quantity`, `total_cost`, `status`, `created_at`) VALUES
 (1, 1, 'product', 2, 5, 1000.00, 'paid', '2025-04-08 11:12:31'),
-(2, 3, 'service', 1, 2, 144.00, 'approved', '2025-04-08 11:36:31'),
-(3, 30, 'service', 1, 3, 243.00, 'received', '2025-04-08 11:36:31');
+(2, 3, 'service', 1, 2, 144.00, 'received', '2025-04-08 11:36:31'),
+(3, 30, 'service', 1, 3, 243.00, 'paid', '2025-04-08 11:36:31'),
+(4, 1, 'service', 2, 7, 945.00, 'paid', '2025-04-10 12:50:48'),
+(5, 2, 'service', 2, 6, 540.00, 'received', '2025-04-10 12:50:48'),
+(6, 1, 'product', 2, 7, 81900.00, 'paid', '2025-04-10 12:50:48'),
+(7, 1, 'product', 3, 2, 23400.00, 'approved', '2025-04-10 13:09:48');
 
 -- --------------------------------------------------------
 
@@ -573,9 +577,9 @@ CREATE TABLE `store_items` (
 --
 
 INSERT INTO `store_items` (`id`, `service_id`, `item_name`, `item_cost_per_person`, `quantity`, `created_at`) VALUES
-(1, 1, 'PA System', 150.00, 100, '2025-04-06 06:25:22'),
-(2, 1, 'Projector & Screen', 100.00, 100, '2025-04-06 06:25:22'),
-(3, 1, 'Conference Tables & Chairs', 80.00, 100, '2025-04-06 06:25:22'),
+(1, 1, 'PA System', 150.00, 107, '2025-04-06 06:25:22'),
+(2, 1, 'Projector & Screen', 100.00, 106, '2025-04-06 06:25:22'),
+(3, 1, 'Conference Tables & Chairs', 80.00, 102, '2025-04-06 06:25:22'),
 (4, 1, 'Corporate Banners', 50.00, 100, '2025-04-06 06:25:22'),
 (5, 1, 'Lunch Catering', 300.00, 100, '2025-04-06 06:25:22'),
 (6, 2, 'LED Lighting Setup', 120.00, 100, '2025-04-06 06:25:22'),
@@ -657,7 +661,10 @@ CREATE TABLE `supplier_payments` (
 --
 
 INSERT INTO `supplier_payments` (`id`, `payment_method`, `status`, `reference_code`, `supplier_id`, `storekeeper_selected_item_id`, `paid_amount`, `payment_date`) VALUES
-(6, 'mpesa', 'approved', '1234567897', 2, 1, 5000.00, '2025-04-08 18:18:02');
+(6, 'mpesa', 'approved', '1234567897', 2, 1, 5000.00, '2025-04-08 18:18:02'),
+(7, 'mpesa', 'approved', 'QWEDRTF532', 1, 3, 729.00, '2025-04-10 12:47:39'),
+(8, 'mpesa', 'pending', 'qwedfr56ty', 2, 4, 6615.00, '2025-04-10 12:55:20'),
+(9, 'mpesa', 'pending', 'qwer43rfd4', 2, 6, 573300.00, '2025-04-10 13:08:14');
 
 --
 -- Indexes for dumped tables
@@ -970,7 +977,7 @@ ALTER TABLE `storekeeper`
 -- AUTO_INCREMENT for table `storekeeper_selected_items`
 --
 ALTER TABLE `storekeeper_selected_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `store_items`
@@ -988,7 +995,7 @@ ALTER TABLE `suppliers`
 -- AUTO_INCREMENT for table `supplier_payments`
 --
 ALTER TABLE `supplier_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables

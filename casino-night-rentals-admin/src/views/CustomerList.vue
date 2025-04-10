@@ -7,20 +7,19 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search customers..."
-          @input="filterCustomers"
+          @input="debounceFilterCustomers"
           class="search-input"
         />
         <span class="search-icon">🔍</span>
       </div>
     </div>
-    
+
     <!-- Pending Customers Section -->
     <div class="customer-section">
       <div class="section-header">
         <h2>New Registrations <span class="badge">{{ pendingCustomers.length }} pending</span></h2>
       </div>
       <div v-if="filteredPendingCustomers.length === 0" class="empty-state">
-        <img src="@/assets/no-data.svg" alt="No customers" class="empty-icon" />
         <p>No pending customers found</p>
       </div>
       <div v-else class="table-responsive">
@@ -64,7 +63,6 @@
         <h2>Approved Customers <span class="badge approved">{{ approvedCustomers.length }} approved</span></h2>
       </div>
       <div v-if="filteredApprovedCustomers.length === 0" class="empty-state">
-        <img src="@/assets/no-data.svg" alt="No customers" class="empty-icon" />
         <p>No approved customers found</p>
       </div>
       <div v-else class="table-responsive">
@@ -99,8 +97,6 @@
 
 <script>
 import api from '../api';
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
 
 export default {
   data() {
@@ -109,9 +105,10 @@ export default {
       searchQuery: '',
       filteredPendingCustomers: [],
       filteredApprovedCustomers: [],
-      loading: false,
       approvingId: null,
-      error: null
+      error: null,
+      debounceTimeout: null,
+      isLoading: false
     };
   },
   computed: {
@@ -127,52 +124,56 @@ export default {
   },
   methods: {
     async fetchCustomers() {
-      this.loading = true;
-      this.error = null;
+      this.isLoading = true;
       try {
         const response = await api.get('/admin/customers');
         this.allCustomers = response.data;
         this.filterCustomers();
       } catch (error) {
         console.error('Error fetching customers:', error);
-        toast.error('Failed to load customers. Please try again.', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000
-        });
+        this.error = 'Failed to load customers. Please try again.';
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
+
+    debounceFilterCustomers() {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.filterCustomers();
+      }, 300);
+    },
+
     filterCustomers() {
       const query = this.searchQuery.toLowerCase();
-      this.filteredPendingCustomers = this.pendingCustomers.filter(customer => 
-        Object.values(customer).some(
-          val => val && val.toString().toLowerCase().includes(query)
-        );
-      this.filteredApprovedCustomers = this.approvedCustomers.filter(customer => 
-        Object.values(customer).some(
-          val => val && val.toString().toLowerCase().includes(query)
-        );
+      this.filteredPendingCustomers = this.pendingCustomers.filter(customer => {
+        return Object.values(customer).some(val => {
+          return val && val.toString().toLowerCase().includes(query);
+        });
+      });
+      this.filteredApprovedCustomers = this.approvedCustomers.filter(customer => {
+        return Object.values(customer).some(val => {
+          return val && val.toString().toLowerCase().includes(query);
+        });
+      });
     },
+
     async approveCustomer(customerId) {
       this.approvingId = customerId;
       try {
         await api.patch(`/admin/customers/${customerId}/status`, { is_approved: 1 });
-        toast.success('Customer approved successfully!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true
-        });
-        await this.fetchCustomers();
+        
+        // Update the local state immediately for better UX
+        const customerIndex = this.allCustomers.findIndex(c => c.id === customerId);
+        if (customerIndex !== -1) {
+          this.allCustomers[customerIndex].is_approved = 1;
+          this.filterCustomers(); // Re-filter after update
+        }
+        
+        this.$toast.success('Customer approved successfully!');
       } catch (error) {
         console.error('Error approving customer:', error);
-        toast.error('Failed to approve customer. Please try again.', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000
-        });
+        this.$toast.error('Failed to approve customer. Please try again.');
       } finally {
         this.approvingId = null;
       }
@@ -354,35 +355,18 @@ h2 {
   margin-top: 1rem;
 }
 
-.empty-icon {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1rem;
-  opacity: 0.6;
-}
-
 .spinner {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #4CAF50;
   border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  .header-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .search-box {
-    width: 100%;
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
