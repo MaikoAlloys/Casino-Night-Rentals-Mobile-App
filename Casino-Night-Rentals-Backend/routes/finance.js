@@ -422,5 +422,115 @@ router.post('/pay-supplier', async (req, res) => {
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   });
+
+  //fetching feedback  for finance
+  router.get("/finance-feedback", async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Fetching feedback for finance`);
+  
+    try {
+      // Step 1: Fetch feedback sent to finance (with customer name)
+      const [feedbackResults] = await pool.query(
+        `SELECT 
+           f.feedback_id,
+           f.customer_id,
+           CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+           f.message,
+           f.rating,
+           f.created_at,
+           f.status,
+           f.reply,
+           f.reply_by,
+           f.reply_time
+         FROM feedback f
+         JOIN customers c ON f.customer_id = c.id
+         WHERE f.finance_id IS NOT NULL
+         ORDER BY f.created_at DESC`
+      );
+  
+      if (feedbackResults.length === 0) {
+        return res.json({
+          success: true,
+          message: 'No feedback found for finance',
+          feedback: []
+        });
+      }
+  
+      res.json({
+        success: true,
+        feedback: feedbackResults
+      });
+  
+    } catch (error) {
+      console.error(`Error fetching finance feedback:`, error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  });
+
+  
+  // POST /finance/feedback/reply
+router.post("/reply", async (req, res) => {
+    const { feedbackId, reply } = req.body;
+  
+    console.log(`[${new Date().toISOString()}] Finance replying to feedback ${feedbackId}`);
+  
+    if (!feedbackId || !reply) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: feedbackId or reply"
+      });
+    }
+  
+    try {
+      // Step 1: Check if feedback exists and is assigned to finance
+      const [feedbackCheck] = await pool.query(
+        `SELECT * FROM feedback 
+         WHERE feedback_id = ? AND finance_id IS NOT NULL`,
+        [feedbackId]
+      );
+  
+      if (feedbackCheck.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Feedback not found or not assigned to finance"
+        });
+      }
+  
+      // Step 2: Update the feedback with the reply
+      await pool.query(
+        `UPDATE feedback 
+         SET reply = ?, 
+             reply_by = 'Finance',
+             reply_time = NOW(), 
+             status = 'resolved'
+         WHERE feedback_id = ? AND finance_id IS NOT NULL`,
+        [reply, feedbackId]
+      );
+  
+      // Step 3: Fetch updated feedback
+      const [updatedFeedback] = await pool.query(
+        'SELECT * FROM feedback WHERE feedback_id = ?',
+        [feedbackId]
+      );
+  
+      res.json({
+        success: true,
+        message: "Reply submitted successfully",
+        feedback: updatedFeedback[0]
+      });
+  
+    } catch (error) {
+      console.error(`Error replying to finance feedback ${feedbackId}:`, error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
+    }
+  });
+  
   
 module.exports = router;

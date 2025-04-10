@@ -144,17 +144,29 @@ const EventManagerDashboard = () => {
                         <MaterialIcons name="inventory" size={20} color="#3498db" />
                         <Text style={styles.navItem}>Reserve Items</Text>
                     </TouchableOpacity>
+
+                              <TouchableOpacity 
+                                style={styles.navButton}
+                                onPress={() => { 
+                                  router.push("/event-manager-feedback"); 
+                                  toggleSidebar(); 
+                                }}
+                                >
+                                <MaterialIcons name="feedback" size={20} color="#3498db" />
+                                <Text style={styles.navItem}>Feedback</Text>
+                                </TouchableOpacity>
+                    
                     <TouchableOpacity 
-    style={styles.navButton} 
-    onPress={() => { 
-        
-        router.push("/");  // Router push to home
-        toggleSidebar();  // Close the sidebar after logout
-    }}
->
-    <MaterialIcons name="logout" size={20} color="#3498db" />
-    <Text style={styles.navItem}>Logout</Text>
-</TouchableOpacity>
+                    style={styles.navButton} 
+                    onPress={() => { 
+                        
+                            router.push("/");  // Router push to home
+                            toggleSidebar();  // Close the sidebar after logout
+                        }}
+                    >
+                        <MaterialIcons name="logout" size={20} color="#3498db" />
+                        <Text style={styles.navItem}>Logout</Text>
+                    </TouchableOpacity>
 
                 </View>
             </Animated.View>

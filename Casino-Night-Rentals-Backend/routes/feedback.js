@@ -8,8 +8,8 @@ const jwt = require("jsonwebtoken");
 router.get("/users", authenticateCustomer, async (req, res) => {
   try {
     // Fetch customers
-    const customersQuery = "SELECT CONCAT(first_name, ' ', last_name) AS customer_name FROM customers";
-    const [customers] = await pool.query(customersQuery);
+    // const customersQuery = "SELECT CONCAT(first_name, ' ', last_name) AS customer_name FROM customers";
+    // const [customers] = await pool.query(customersQuery);
 
     // Fetch dealers
     const dealersQuery = "SELECT CONCAT(first_name, ' ', last_name) AS dealer_name FROM dealers";
@@ -29,7 +29,7 @@ router.get("/users", authenticateCustomer, async (req, res) => {
 
     // Combine all results into a single array
     const allUsers = [
-      ...customers.map(user => ({ customer_name: user.customer_name })),
+    //   ...customers.map(user => ({ customer_name: user.customer_name })),
       ...dealers.map(user => ({ dealer_name: user.dealer_name })),
       ...serviceManagers.map(user => ({ service_manager_name: user.service_manager_name })),
       ...finance.map(user => ({ finance_name: user.finance_name })),

@@ -173,7 +173,7 @@ const SupplierPayments = () => {
                   item.payment_status === 'approved' ? styles.approvedBadge : styles.pendingBadge
                 ]}>
                   <Text style={styles.statusText}>
-                    {item.payment_status === 'approved' ? 'Approved' : 'Pending Approval'}
+                    {item.payment_status === 'approved' ? 'Confirmed' : 'Pending Confirmation'}
                   </Text>
                 </View>
               </View>

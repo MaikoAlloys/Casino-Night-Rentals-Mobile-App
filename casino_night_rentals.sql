@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2025 at 09:22 PM
+-- Generation Time: Apr 10, 2025 at 02:56 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,24 @@ SET time_zone = "+00:00";
 --
 -- Database: `casino_night_rentals`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`username`, `password`) VALUES
+('admin', '1234');
 
 -- --------------------------------------------------------
 
@@ -253,7 +271,12 @@ CREATE TABLE `feedback` (
 
 INSERT INTO `feedback` (`feedback_id`, `customer_id`, `dealer_id`, `service_manager_id`, `finance_id`, `event_manager_id`, `message`, `rating`, `created_at`, `status`, `reply`, `reply_by`, `reply_time`) VALUES
 (7, 1, 1, NULL, NULL, NULL, 'Sasa Nyangweso', 3, '2025-04-07 18:32:50', 'resolved', 'Niaje Nyasuguta!', 'Dealer 1', '2025-04-07 18:33:50'),
-(8, 3, 2, NULL, NULL, NULL, 'Thanks ', 4, '2025-04-08 07:49:48', 'resolved', 'Welcome ', 'Dealer 2', '2025-04-08 07:50:14');
+(8, 3, 2, NULL, NULL, NULL, 'Thanks ', 4, '2025-04-08 07:49:48', 'resolved', 'Welcome ', 'Dealer 2', '2025-04-08 07:50:14'),
+(9, 1, NULL, NULL, 1, NULL, 'Hey Daniel', 3, '2025-04-09 07:09:40', 'pending', NULL, NULL, NULL),
+(10, 1, NULL, 1, NULL, NULL, 'Hey John Ser', 3, '2025-04-09 07:13:23', 'resolved', 'Thank you for your feedback. We\'ll follow up shortly.', 'Service Manager', '2025-04-09 21:02:16'),
+(11, 1, NULL, NULL, NULL, 1, 'Hey Grace een', 3, '2025-04-09 07:14:55', 'resolved', 'Thank you for your feedback. We will act on it.', 'Event Manager', '2025-04-09 21:07:54'),
+(12, 1, 2, NULL, NULL, NULL, 'Hey Doris', 3, '2025-04-09 08:07:49', 'pending', NULL, NULL, NULL),
+(13, 1, NULL, NULL, 1, NULL, 'Hey finance', 3, '2025-04-09 13:09:40', 'resolved', 'Hey secondtime', 'Finance', '2025-04-09 21:34:20');
 
 -- --------------------------------------------------------
 
@@ -641,6 +664,12 @@ INSERT INTO `supplier_payments` (`id`, `payment_method`, `status`, `reference_co
 --
 
 --
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`username`);
+
+--
 -- Indexes for table `cart`
 --
 ALTER TABLE `cart`
@@ -875,7 +904,7 @@ ALTER TABLE `event_product_booking`
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `finance`

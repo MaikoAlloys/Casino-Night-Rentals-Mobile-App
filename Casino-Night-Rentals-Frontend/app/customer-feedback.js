@@ -88,7 +88,6 @@ const CustomerFeedback = () => {
       });
       setFeedbackReplies(response.data);
     } catch (error) {
-    //   console.error('Error fetching feedback replies:', error);
       Alert.alert('Error', 'Failed to load feedback replies');
     }
   };
@@ -163,6 +162,22 @@ const CustomerFeedback = () => {
     }
   };
 
+  const getRecipientName = (feedback) => {
+    if (feedback.dealer_name) return feedback.dealer_name;
+    if (feedback.service_manager_name) return feedback.service_manager_name;
+    if (feedback.finance_name) return feedback.finance_name;
+    if (feedback.event_manager_name) return feedback.event_manager_name;
+    return 'Recipient';
+  };
+
+  const getRecipientType = (feedback) => {
+    if (feedback.dealer_name) return 'Dealer';
+    if (feedback.service_manager_name) return 'Service Manager';
+    if (feedback.finance_name) return 'Finance';
+    if (feedback.event_manager_name) return 'Event Manager';
+    return 'Recipient';
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -200,7 +215,7 @@ const CustomerFeedback = () => {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>User Type:</Text>
           <Text style={styles.userType}>
-            {selectedUser ? userType : 'Not selected'}
+            {selectedUser ? userType.replace('_', ' ').toUpperCase() : 'Not selected'}
           </Text>
         </View>
         
@@ -245,7 +260,7 @@ const CustomerFeedback = () => {
           {submittedFeedbacks.map(feedback => (
             <View key={feedback.id} style={styles.feedbackCard}>
               <Text style={styles.feedbackHeader}>
-                To: {feedback.recipient} ({feedback.recipientType})
+                To: {feedback.recipient} ({feedback.recipientType.replace('_', ' ').toUpperCase()})
               </Text>
               <Text style={styles.feedbackRating}>Rating: {feedback.rating}/5</Text>
               <Text style={styles.feedbackMessage}>{feedback.message}</Text>
@@ -260,17 +275,18 @@ const CustomerFeedback = () => {
           {feedbackReplies.map(feedback => (
             <View key={feedback.feedback_id} style={styles.feedbackCard}>
               <Text style={styles.feedbackHeader}>
-                To: {feedback.dealer_name || 'Dealer'}
+                To: {getRecipientName(feedback)} ({getRecipientType(feedback)})
               </Text>
+              <Text style={styles.feedbackRating}>Rating: {feedback.rating}/5</Text>
               <Text style={styles.feedbackMessage}>{feedback.feedback_message}</Text>
               <Text style={styles.feedbackTime}>
                 Sent: {new Date(feedback.created_at).toLocaleString()}
               </Text>
               
-              {feedback.dealer_reply ? (
+              {feedback.reply ? (
                 <>
-                  <Text style={styles.replyHeader}>Dealer's Reply:</Text>
-                  <Text style={styles.replyText}>{feedback.dealer_reply}</Text>
+                  <Text style={styles.replyHeader}>{getRecipientType(feedback)}'s Reply:</Text>
+                  <Text style={styles.replyText}>{feedback.reply}</Text>
                   <Text style={styles.replyTime}>
                     Replied on: {new Date(feedback.reply_time).toLocaleString()} by {feedback.reply_by}
                   </Text>

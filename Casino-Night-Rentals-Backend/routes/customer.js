@@ -453,22 +453,29 @@ router.put('/confirm-service/:id', authenticateCustomer, async (req, res) => {
 // Route to fetch feedback replies for the logged-in customer
 router.get('/customer-feedback-replies', authenticateCustomer, async (req, res) => {
   try {
-    const customerId = req.customer.id; // Logged-in customer's ID
+    const customerId = req.customer.id;
 
-    // Fetch feedback details along with the dealer's reply
     const query = `
       SELECT 
         f.feedback_id,
         f.message AS feedback_message,
+        f.rating,
         CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
         CONCAT(d.first_name, ' ', d.last_name) AS dealer_name,
-        f.reply AS dealer_reply,
+        CONCAT(fin.first_name, ' ', fin.last_name) AS finance_name,
+        CONCAT(sm.first_name, ' ', sm.last_name) AS service_manager_name,
+        CONCAT(em.first_name, ' ', em.last_name) AS event_manager_name,
+        f.reply,
         f.reply_by,
+        f.created_at,
         f.reply_time,
         f.status
       FROM feedback f
       LEFT JOIN customers c ON f.customer_id = c.id
       LEFT JOIN dealers d ON f.dealer_id = d.id
+      LEFT JOIN finance fin ON f.finance_id = fin.id
+      LEFT JOIN service_manager sm ON f.service_manager_id = sm.id
+      LEFT JOIN event_manager em ON f.event_manager_id = em.id
       WHERE f.customer_id = ?
     `;
 
@@ -485,6 +492,5 @@ router.get('/customer-feedback-replies', authenticateCustomer, async (req, res) 
     res.status(500).json({ message: 'Database error', error: err });
   }
 });
-
 
 module.exports = router;

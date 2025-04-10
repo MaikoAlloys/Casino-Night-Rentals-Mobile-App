@@ -107,7 +107,7 @@ const FinanceDashboard = () => {
                     <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-supplier-payments"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Supplier payments</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/customer-feedback"); toggleSidebar(); }}>
+                    <TouchableOpacity style={styles.navButton} onPress={() => { router.push("/finance-feedback"); toggleSidebar(); }}>
                         <Text style={styles.navItem}>Feedback</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.navButton} onPress={async () => { 

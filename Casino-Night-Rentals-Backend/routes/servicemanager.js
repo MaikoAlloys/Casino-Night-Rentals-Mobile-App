@@ -153,4 +153,109 @@ router.get('/service-manager', async (req, res) => {
 });
 
 
+// GET /service-manager/feedback
+router.get("/feedback", async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Fetching feedback for service manager`);
+  
+    try {
+      const [feedbackResults] = await pool.query(
+        `SELECT 
+           f.feedback_id,
+           f.customer_id,
+           CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+           f.message,
+           f.rating,
+           f.created_at,
+           f.status,
+           f.reply,
+           f.reply_by,
+           f.reply_time
+         FROM feedback f
+         JOIN customers c ON f.customer_id = c.id
+         WHERE f.service_manager_id IS NOT NULL
+         ORDER BY f.created_at DESC`
+      );
+  
+      if (feedbackResults.length === 0) {
+        return res.json({
+          success: true,
+          message: 'No feedback found for service manager',
+          feedback: []
+        });
+      }
+  
+      res.json({
+        success: true,
+        feedback: feedbackResults
+      });
+  
+    } catch (error) {
+      console.error(`Error fetching service manager feedback:`, error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  });
+  
+
+  // POST /service-manager/feedback/reply
+router.post("/feedback/reply", async (req, res) => {
+    const { feedbackId, reply } = req.body;
+  
+    console.log(`[${new Date().toISOString()}] Service Manager replying to feedback ${feedbackId}`);
+  
+    if (!feedbackId || !reply) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: feedbackId or reply"
+      });
+    }
+  
+    try {
+      const [feedbackCheck] = await pool.query(
+        `SELECT * FROM feedback 
+         WHERE feedback_id = ? AND service_manager_id IS NOT NULL`,
+        [feedbackId]
+      );
+  
+      if (feedbackCheck.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Feedback not found or not assigned to service manager"
+        });
+      }
+  
+      await pool.query(
+        `UPDATE feedback 
+         SET reply = ?, 
+             reply_by = 'Service Manager',
+             reply_time = NOW(), 
+             status = 'resolved'
+         WHERE feedback_id = ? AND service_manager_id IS NOT NULL`,
+        [reply, feedbackId]
+      );
+  
+      const [updatedFeedback] = await pool.query(
+        'SELECT * FROM feedback WHERE feedback_id = ?',
+        [feedbackId]
+      );
+  
+      res.json({
+        success: true,
+        message: "Reply submitted successfully",
+        feedback: updatedFeedback[0]
+      });
+  
+    } catch (error) {
+      console.error(`Error replying to service manager feedback ${feedbackId}:`, error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
+    }
+  });
+  
 module.exports = router;

@@ -64,42 +64,55 @@ const ServiceManagerDashboard = () => {
     <View style={styles.container}>
       {/* Sidebar Navigation */}
       <Animated.View style={[styles.sidebar, { left: sidebarAnim }]}>
-        <View style={styles.sidebarHeader}>
-          <Text style={styles.sidebarTitle}>Service Manager</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={toggleSidebar}>
-            <MaterialIcons name="close" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.sidebarMenu}>
-          <TouchableOpacity 
-            style={styles.navButton}
-            onPress={() => { 
-              router.push("/service-manager-dashboard"); 
-              toggleSidebar(); 
-            }}
-          >
-            <MaterialIcons name="dashboard" size={20} color="#3498db" />
-            <Text style={styles.navItem}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.navButton}
-            onPress={() => { 
-              router.push("/service-manager-profile"); 
-              toggleSidebar(); 
-            }}
-          >
-            <MaterialIcons name="person" size={20} color="#3498db" />
-            <Text style={styles.navItem}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.navButton}
-            onPress={handleLogout}
-          >
-            <MaterialIcons name="logout" size={20} color="#3498db" />
-            <Text style={styles.navItem}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+  <View style={styles.sidebarHeader}>
+    <Text style={styles.sidebarTitle}>Service Manager</Text>
+    <TouchableOpacity style={styles.closeButton} onPress={toggleSidebar}>
+      <MaterialIcons name="close" size={24} color="#fff" />
+    </TouchableOpacity>
+  </View>
+  <View style={styles.sidebarMenu}>
+    <TouchableOpacity 
+      style={styles.navButton}
+      onPress={() => { 
+        router.push("/service-manager-dashboard"); 
+        toggleSidebar(); 
+      }}
+    >
+      <MaterialIcons name="dashboard" size={20} color="#3498db" />
+      <Text style={styles.navItem}>Dashboard</Text>
+    </TouchableOpacity>
+    
+    <TouchableOpacity 
+      style={styles.navButton}
+      onPress={() => { 
+        router.push("/service-manager-profile"); 
+        toggleSidebar(); 
+      }}
+    >
+      <MaterialIcons name="person" size={20} color="#3498db" />
+      <Text style={styles.navItem}>Profile</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity 
+      style={styles.navButton}
+      onPress={() => { 
+        router.push("/service-manager-feedback"); 
+        toggleSidebar(); 
+      }}
+    >
+      <MaterialIcons name="feedback" size={20} color="#3498db" />
+      <Text style={styles.navItem}>Feedback</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity 
+      style={styles.navButton}
+      onPress={handleLogout}
+    >
+      <MaterialIcons name="logout" size={20} color="#3498db" />
+      <Text style={styles.navItem}>Logout</Text>
+    </TouchableOpacity>
+  </View>
+</Animated.View>
 
       {/* Main Content */}
       <View style={styles.mainContent}>

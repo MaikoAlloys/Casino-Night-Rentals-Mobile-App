@@ -378,16 +378,17 @@ const DealerDashboard = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.sidebarMenu}>
-          <TouchableOpacity 
+          {/* <TouchableOpacity 
             style={styles.navButton} 
             onPress={() => { 
               router.push(`/dealer-dashboard/${dealerId}`); 
               toggleSidebar(); 
             }}
+
           >
             <MaterialIcons name="home" size={20} color="#4A90E2" />
             <Text style={styles.navItem}>Home</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           
           <TouchableOpacity 
             style={styles.navButton} 
