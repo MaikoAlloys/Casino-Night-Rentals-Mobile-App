@@ -223,11 +223,15 @@ const SupplierDashboard = () => {
                       </View>
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>Unit Cost:</Text>
-                        <Text style={styles.detailValue}>Kshs {parseFloat(item.item_total_cost / item.quantity).toFixed(2)}</Text>
+                        <Text style={styles.detailValue}>
+                          Kshs {(item.total_cost / item.quantity).toFixed(2)}
+                        </Text>
                       </View>
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>Total Cost:</Text>
-                        <Text style={styles.detailValue}>Kshs {parseFloat(item.item_total_cost).toFixed(2)}</Text>
+                        <Text style={styles.detailValue}>
+                          Kshs {item.total_cost.toFixed(2)}
+                        </Text>
                       </View>
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>Request Date:</Text>
@@ -245,7 +249,7 @@ const SupplierDashboard = () => {
             <View style={styles.totalContainer}>
               <Text style={styles.totalLabel}>Grand Total:</Text>
               <Text style={styles.totalAmount}>
-                Kshs {tenders.reduce((sum, item) => sum + parseFloat(item.item_total_cost), 0).toFixed(2)}
+                Kshs {tenders.reduce((sum, item) => sum + item.total_cost, 0).toFixed(2)}
               </Text>
             </View>
 
@@ -296,22 +300,21 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     backgroundColor: '#0066cc',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    padding: 10,
     borderRadius: 5,
   },
   retryButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: 15,
+    backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
     fontSize: 20,
@@ -325,83 +328,81 @@ const styles = StyleSheet.create({
     width: width * 0.7,
     backgroundColor: '#2c3e50',
     zIndex: 100,
-    paddingTop: 50,
   },
   sidebarHeader: {
+    padding: 20,
+    backgroundColor: '#1a252f',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#34495e',
   },
   sidebarTitle: {
-    color: '#fff',
+    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
   closeButton: {
-    padding: 8,
+    padding: 5,
   },
   sidebarMenu: {
-    paddingVertical: 16,
+    paddingVertical: 20,
   },
   navButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
   },
   navItem: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
-    marginLeft: 12,
+    marginLeft: 15,
   },
   content: {
-    padding: 16,
-    paddingBottom: 80,
+    padding: 15,
+    paddingBottom: 30,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 15,
     color: '#333',
-    marginBottom: 16,
   },
   emptyContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    paddingVertical: 50,
   },
   emptyText: {
-    color: '#666',
+    marginTop: 15,
+    color: '#888',
     fontSize: 16,
-    marginTop: 16,
-    textAlign: 'center',
   },
   tenderCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 8,
-    marginBottom: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    marginBottom: 15,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   selectedCard: {
-    borderColor: '#3498db',
     borderWidth: 2,
+    borderColor: '#3498db',
   },
   tenderContent: {
-    padding: 16,
+    padding: 15,
   },
   itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   itemName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     flex: 1,
   },
   itemType: {
@@ -409,59 +410,56 @@ const styles = StyleSheet.create({
     color: '#666',
     backgroundColor: '#eee',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginLeft: 10,
   },
   itemDetails: {
-    marginTop: 8,
+    marginTop: 10,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 5,
   },
   detailLabel: {
-    fontSize: 14,
     color: '#666',
+    fontSize: 14,
   },
   detailValue: {
-    fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    fontSize: 14,
   },
   totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: '#fff',
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: 'white',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    elevation: 2,
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   totalAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#3498db',
   },
   approveButton: {
-    backgroundColor: '#2e7d32',
-    padding: 16,
+    backgroundColor: '#3498db',
+    padding: 15,
     borderRadius: 8,
-    marginTop: 16,
+    marginTop: 20,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#81c784',
+    backgroundColor: '#95a5a6',
   },
   approveButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },

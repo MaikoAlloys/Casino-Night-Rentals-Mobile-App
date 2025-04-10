@@ -68,7 +68,7 @@ const StorekeeperSupplyMaterialReceive = () => {
   };
 
   const calculateGrandTotal = () => {
-    return approvedItems.reduce((sum, item) => sum + item.grand_total, 0);
+    return approvedItems.reduce((sum, item) => sum + parseFloat(item.grand_total), 0);
   };
 
   if (loading) {
@@ -126,11 +126,11 @@ const StorekeeperSupplyMaterialReceive = () => {
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Unit Cost:</Text>
-                    <Text style={styles.detailValue}>Kshs {parseFloat(item.total_cost).toFixed(2)}</Text>
+                    <Text style={styles.detailValue}>Kshs {item.total_cost/item.quantity}</Text>
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Total Cost:</Text>
-                    <Text style={styles.detailValue}>Kshs {item.grand_total.toFixed(2)}</Text>
+                    <Text style={styles.detailValue}>Kshs {item.grand_total}</Text>
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Approved On:</Text>
@@ -174,8 +174,8 @@ const StorekeeperSupplyMaterialReceive = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 16,
+    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
@@ -196,19 +196,18 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     backgroundColor: '#0066cc',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    padding: 10,
     borderRadius: 5,
   },
   retryButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 8,
     color: '#333',
-    marginBottom: 4,
   },
   subHeader: {
     fontSize: 16,
@@ -219,38 +218,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    paddingVertical: 50,
   },
   emptyText: {
-    color: '#666',
+    marginTop: 15,
+    color: '#888',
     fontSize: 16,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  listContent: {
-    paddingBottom: 20,
   },
   itemCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 8,
-    marginBottom: 16,
     padding: 16,
+    marginBottom: 16,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
-    alignItems: 'center',
   },
   itemName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     flex: 1,
   },
   itemType: {
@@ -258,12 +251,12 @@ const styles = StyleSheet.create({
     color: '#666',
     backgroundColor: '#eee',
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginLeft: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginLeft: 10,
   },
   itemDetails: {
-    marginVertical: 8,
+    marginTop: 10,
   },
   detailRow: {
     flexDirection: 'row',
@@ -271,47 +264,48 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   detailLabel: {
-    fontSize: 14,
     color: '#666',
-    fontWeight: '500',
+    fontSize: 14,
   },
   detailValue: {
+    fontWeight: '500',
     fontSize: 14,
-    color: '#333',
   },
   receiveButton: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2e7d32',
+    alignItems: 'center',
+    backgroundColor: '#28a745',
     padding: 12,
     borderRadius: 6,
-    marginTop: 12,
+    marginTop: 16,
   },
   receiveButtonText: {
-    color: '#fff',
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 20,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginTop: 8,
+    elevation: 2,
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   totalAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#28a745',
+  },
+  listContent: {
+    paddingBottom: 20,
   },
 });
 

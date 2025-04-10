@@ -299,8 +299,8 @@ router.get('/approved-items', async (req, res) => {
         ssi.created_at,
         CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_name,
         COALESCE(p.name, si.item_name) AS item_name,
-        -- Calculate grand total as total_cost * quantity and ensure it returns as a float
-        CAST(ssi.total_cost * ssi.quantity AS DECIMAL(10,2)) AS grand_total
+        -- Don't calculate total_cost * quantity here, return final total_cost and grand_total as is
+        ssi.total_cost AS grand_total
       FROM storekeeper_selected_items ssi
       JOIN suppliers sup ON ssi.supplier_id = sup.id
       LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
@@ -309,10 +309,11 @@ router.get('/approved-items', async (req, res) => {
       ORDER BY ssi.created_at DESC
     `);
 
-    // Format the result to include the grand_total as a float
+    // Ensure total_cost and grand_total are parsed as floats
     const formattedResults = results.map(item => ({
       ...item,
-      grand_total: parseFloat(item.grand_total), // Ensure grand_total is a float
+      total_cost: parseFloat(item.total_cost).toFixed(2), // Ensure total_cost is a float
+      grand_total: parseFloat(item.grand_total).toFixed(2), // Ensure grand_total is a float
     }));
 
     res.json({ success: true, data: formattedResults });

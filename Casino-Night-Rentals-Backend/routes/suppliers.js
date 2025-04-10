@@ -33,72 +33,72 @@ router.post("/login", async (req, res) => {
 
 // GET /supplier/items
 router.get('/items/:supplierId', async (req, res) => {
-    const { supplierId } = req.params; // Get the supplierId from the request params
-  
-    console.log(`[${new Date().toISOString()}] Fetching items for supplier: ${supplierId}`);
-  
-    try {
-      // Check if the supplier exists
-      const [supplierCheck] = await pool.query(
-        'SELECT id FROM suppliers WHERE id = ?',
-        [supplierId]
-      );
-  
-      if (supplierCheck.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'Supplier not found'
-        });
-      }
-  
-      // Fetch all pending items for this supplier from storekeeper_selected_items table and join with products or store_items
-      const [items] = await pool.query(
-        `SELECT 
-          si.id AS item_id,
-          si.item_type,
-          si.supplier_id,
-          si.quantity,
-          si.total_cost,
-          si.created_at,
-          (si.quantity * si.total_cost) AS item_total_cost,
-          CASE 
-            WHEN si.item_type = 'product' THEN p.name
-            WHEN si.item_type = 'service' THEN si_service.item_name
-            ELSE NULL
-          END AS item_name
-        FROM storekeeper_selected_items si
-        LEFT JOIN products p ON si.item_type = 'product' AND p.id = si.item_id
-        LEFT JOIN store_items si_service ON si.item_type = 'service' AND si_service.id = si.item_id
-        WHERE si.supplier_id = ? AND si.status = 'pending'`,
-        [supplierId]
-      );
-  
-      if (items.length === 0) {
-        return res.json({
-          success: true,
-          message: 'No pending items found for this supplier',
-          items: []
-        });
-      }
-  
-      // Calculate the total cost for all items (as a float)
-      const grandTotal = items.reduce((sum, item) => sum + parseFloat(item.item_total_cost), 0);
-  
-      res.json({
-        success: true,
-        items,
-        grandTotal
-      });
-  
-    } catch (error) {
-      console.error(`Error fetching items for supplier ${supplierId}:`, error);
-      res.status(500).json({
+  const { supplierId } = req.params; // Get the supplierId from the request params
+
+  console.log(`[${new Date().toISOString()}] Fetching items for supplier: ${supplierId}`);
+
+  try {
+    // Check if the supplier exists
+    const [supplierCheck] = await pool.query(
+      'SELECT id FROM suppliers WHERE id = ?',
+      [supplierId]
+    );
+
+    if (supplierCheck.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: 'Server error',
-        error: error.message
+        message: 'Supplier not found'
       });
     }
-  });
+
+    // Fetch all pending items for this supplier from storekeeper_selected_items table and join with products or store_items
+    const [items] = await pool.query(
+      `SELECT 
+        si.id AS item_id,
+        si.item_type,
+        si.supplier_id,
+        si.quantity,
+        si.total_cost,  -- Fetch the total cost directly
+        si.created_at,
+        CASE 
+          WHEN si.item_type = 'product' THEN p.name
+          WHEN si.item_type = 'service' THEN si_service.item_name
+          ELSE NULL
+        END AS item_name
+      FROM storekeeper_selected_items si
+      LEFT JOIN products p ON si.item_type = 'product' AND p.id = si.item_id
+      LEFT JOIN store_items si_service ON si.item_type = 'service' AND si_service.id = si.item_id
+      WHERE si.supplier_id = ? AND si.status = 'pending'`,
+      [supplierId]
+    );
+
+    if (items.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No pending items found for this supplier',
+        items: []
+      });
+    }
+
+    // Send items as they are without recalculating total cost
+    res.json({
+      success: true,
+      items: items.map(item => ({
+        ...item,
+        total_cost: parseFloat(item.total_cost), // Ensure the total cost is sent as a float
+      }))
+    });
+
+  } catch (error) {
+    console.error(`Error fetching items for supplier ${supplierId}:`, error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
   
 // POST /supplier/items/approve
 router.post('/items/approve', async (req, res) => {
@@ -152,72 +152,80 @@ router.post('/items/approve', async (req, res) => {
 
 //fetch paid items
 router.get('/paid-items/:supplierId', async (req, res) => {
-    const { supplierId } = req.params; // Get the supplierId from the request params
-  
-    console.log(`[${new Date().toISOString()}] Fetching paid items for supplier: ${supplierId}`);
-  
-    try {
-      // Check if the supplier exists
-      const [supplierCheck] = await pool.query(
-        'SELECT id FROM suppliers WHERE id = ?',
-        [supplierId]
-      );
-  
-      if (supplierCheck.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'Supplier not found'
-        });
-      }
-  
-      // Fetch all paid items for this supplier from storekeeper_selected_items and supplier_payments tables
-      const [items] = await pool.query(
-        `SELECT 
-          ssi.id AS storekeeper_selected_item_id,
-          ssi.quantity,
-          ssi.total_cost,
-          ROUND(ssi.total_cost * ssi.quantity, 2) AS grand_total,
-          sup.id AS supplier_id,
-          CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,
-          COALESCE(p.name, si.item_name) AS item_name,
-          sp.paid_amount,
-          sp.reference_code,
-          sp.payment_date,
-          sp.status AS payment_status  -- Add status here
-        FROM storekeeper_selected_items ssi
-        JOIN suppliers sup ON ssi.supplier_id = sup.id
-        LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
-        LEFT JOIN store_items si ON ssi.item_type = 'service' AND ssi.item_id = si.id
-        LEFT JOIN supplier_payments sp ON ssi.id = sp.storekeeper_selected_item_id
-        WHERE ssi.supplier_id = ? AND ssi.status = 'paid'`,
-        [supplierId]
-      );
-  
-      if (items.length === 0) {
-        return res.json({
-          success: true,
-          message: 'No paid items found for this supplier',
-          items: []
-        });
-      }
-  
-      // Calculate the total amount paid for all items (as a float)
-      const totalPaidAmount = items.reduce((sum, item) => sum + parseFloat(item.paid_amount), 0);
-  
-      res.json({
-        success: true,
-        items,
-        totalPaidAmount
-      });
-  
-    } catch (error) {
-      console.error(`Error fetching paid items for supplier ${supplierId}:`, error);
-      res.status(500).json({
+  const { supplierId } = req.params;
+
+  console.log(`[${new Date().toISOString()}] Fetching paid items for supplier: ${supplierId}`);
+
+  try {
+    // Check if the supplier exists
+    const [supplierCheck] = await pool.query(
+      'SELECT id FROM suppliers WHERE id = ?',
+      [supplierId]
+    );
+
+    if (supplierCheck.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: 'Server error',
-        error: error.message
+        message: 'Supplier not found'
       });
     }
+
+    // Fetch all paid items for this supplier from storekeeper_selected_items and supplier_payments tables
+    const [items] = await pool.query(
+      `SELECT 
+        ssi.id AS storekeeper_selected_item_id,
+        ssi.quantity,
+        CASE
+          WHEN ssi.item_type = 'product' THEN ROUND(ssi.total_cost / ssi.quantity, 2)
+          ELSE ssi.total_cost
+        END AS total_cost,
+        ROUND(
+          CASE
+            WHEN ssi.item_type = 'product' THEN ssi.total_cost
+            ELSE ssi.total_cost * ssi.quantity
+          END, 2
+        ) AS grand_total,
+        sup.id AS supplier_id,
+        CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,
+        COALESCE(p.name, si.item_name) AS item_name,
+        sp.paid_amount,
+        sp.reference_code,
+        sp.payment_date,
+        sp.status AS payment_status
+      FROM storekeeper_selected_items ssi
+      JOIN suppliers sup ON ssi.supplier_id = sup.id
+      LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
+      LEFT JOIN store_items si ON ssi.item_type = 'service' AND ssi.item_id = si.id
+      LEFT JOIN supplier_payments sp ON ssi.id = sp.storekeeper_selected_item_id
+      WHERE ssi.supplier_id = ? AND ssi.status = 'paid'`,
+      [supplierId]
+    );
+
+    if (items.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No paid items found for this supplier',
+        items: []
+      });
+    }
+
+    // Calculate the total amount paid for all items (as a float)
+    const totalPaidAmount = items.reduce((sum, item) => sum + parseFloat(item.paid_amount), 0);
+
+    res.json({
+      success: true,
+      items,
+      totalPaidAmount
+    });
+
+  } catch (error) {
+    console.error(`Error fetching paid items for supplier ${supplierId}:`, error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
 });
 
   //supplier to approve payment

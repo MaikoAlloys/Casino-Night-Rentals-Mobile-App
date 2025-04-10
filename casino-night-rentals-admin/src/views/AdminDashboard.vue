@@ -126,7 +126,7 @@
                 <i>💬</i>
               </div>
               <div class="card-content">
-                <h3>New Feedback</h3>
+                <h3>Supplier Management</h3>
                 <p>8</p>
               </div>
             </div>
