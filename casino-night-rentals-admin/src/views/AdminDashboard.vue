@@ -123,7 +123,7 @@
           <router-link to="/supplier-management" class="card-link">
             <div class="card">
               <div class="card-icon red">
-                <i>💬</i>
+                <i></i>
               </div>
               <div class="card-content">
                 <h3>Supplier Management</h3>

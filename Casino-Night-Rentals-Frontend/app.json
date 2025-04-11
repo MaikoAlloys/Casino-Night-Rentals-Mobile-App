@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Casino-Night-Rentals-Frontend",
-    "slug": "Casino-Night-Rentals-Frontend",
+    "name": "Casino Night",
+    "slug": "Casino-Night",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Casinologo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
