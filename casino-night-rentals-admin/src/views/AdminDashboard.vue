@@ -91,7 +91,7 @@
               </div>
               <div class="card-content">
                 <h3>Rental Payment</h3>
-                <p>1,248</p>
+                <p></p>
               </div>
             </div>
           </router-link>
@@ -103,7 +103,7 @@
               </div>
               <div class="card-content">
                 <h3>Service Bookings</h3>
-                <p>56</p>
+                <p></p>
               </div>
             </div>
           </router-link>
@@ -115,7 +115,7 @@
               </div>
               <div class="card-content">
                 <h3>Service Payments</h3>
-                <p>12</p>
+                <p></p>
               </div>
             </div>
           </router-link>
@@ -127,7 +127,7 @@
               </div>
               <div class="card-content">
                 <h3>Supplier Management</h3>
-                <p>8</p>
+                <p></p>
               </div>
             </div>
           </router-link>
@@ -141,7 +141,7 @@
                 <i>🔄</i>
               </div>
               <div class="activity-details">
-                <p>New customer registration - John Doe</p>
+                <p>New customer registration</p>
                 <small>10 minutes ago</small>
               </div>
             </div>
@@ -159,7 +159,7 @@
                 <i>💵</i>
               </div>
               <div class="activity-details">
-                <p>Payment received from Acme Corp</p>
+                <p>Payment received from Customer</p>
                 <small>3 hours ago</small>
               </div>
             </div>

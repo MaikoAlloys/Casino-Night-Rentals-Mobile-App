@@ -158,7 +158,7 @@ const FinanceSupplierPayments = () => {
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Unit Cost:</Text>
-                    <Text style={styles.detailValue}>Kshs {parseFloat(item.total_cost).toFixed(2)}</Text>
+                    <Text style={styles.detailValue}>Kshs {parseFloat(item.unit_cost).toFixed(2)}</Text>
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Total Amount:</Text>

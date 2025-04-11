@@ -296,7 +296,7 @@ router.get("/services", async (req, res) => {
   
 //storekeeper payments
   // Endpoint to fetch storekeeper selected items and supplier payment information
-router.get("/storekeeper-supplier-payments", async (req, res) => {
+  router.get("/storekeeper-supplier-payments", async (req, res) => {
     try {
         const [rows] = await pool.query(`
             SELECT 
@@ -310,12 +310,14 @@ router.get("/storekeeper-supplier-payments", async (req, res) => {
                 sp.status AS payment_status,
                 sp.paid_amount,
                 sp.payment_date,
+                CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,  -- Added supplier full name
                 CASE 
                     WHEN ss.item_type = 'service' THEN si.item_name
                     WHEN ss.item_type = 'product' THEN p.name
                 END AS item_name
             FROM storekeeper_selected_items ss
             JOIN supplier_payments sp ON ss.id = sp.storekeeper_selected_item_id
+            JOIN suppliers sup ON ss.supplier_id = sup.id  -- Join to get supplier info
             LEFT JOIN store_items si ON ss.item_id = si.id AND ss.item_type = 'service'
             LEFT JOIN products p ON ss.item_id = p.id AND ss.item_type = 'product'
             ORDER BY sp.payment_date DESC;
@@ -327,5 +329,6 @@ router.get("/storekeeper-supplier-payments", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch storekeeper and supplier payment data" });
     }
 });
+
 
 module.exports = router;

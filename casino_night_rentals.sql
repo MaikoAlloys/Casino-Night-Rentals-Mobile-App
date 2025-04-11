@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2025 at 05:25 PM
+-- Generation Time: Apr 11, 2025 at 02:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -309,7 +309,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `quantity`, `rental_price`, `image_url`, `total_cost`) VALUES
-(1, 'L.E.D ROULETTE TABLE\r\n', 67, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', 13000.00),
+(1, 'L.E.D ROULETTE TABLE\r\n', 70, 1000.00, 'https://tcsjohnhuxley.com/wp-content/uploads/2023/03/Blaze-Roulette-Gaming-Table-Background-1.jpg', 13000.00),
 (2, 'L.E.D BLACKJACK TABLE', 100, 1200.00, 'https://cocoeventsnyc.com/wp-content/uploads/2023/04/light-up-black-jack-3.jpg', 13000.00),
 (3, 'POKER TABLE', 92, 1500.00, 'https://m.media-amazon.com/images/I/61irFiMDcFL._AC_SL1500_.jpg', 13000.00);
 
@@ -440,16 +440,6 @@ CREATE TABLE `storekeeper_selected_items` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `storekeeper_selected_items`
---
-
-INSERT INTO `storekeeper_selected_items` (`id`, `item_id`, `item_type`, `supplier_id`, `quantity`, `total_cost`, `status`, `created_at`) VALUES
-(13, 1, 'product', 1, 3, 35100.00, 'paid', '2025-04-10 15:04:42'),
-(14, 21, 'service', 1, 2, 108.00, 'received', '2025-04-10 15:04:42'),
-(15, 2, 'product', 1, 2, 23400.00, 'received', '2025-04-10 15:19:14'),
-(16, 4, 'service', 1, 2, 90.00, 'received', '2025-04-10 15:19:14');
-
 -- --------------------------------------------------------
 
 --
@@ -470,19 +460,19 @@ CREATE TABLE `store_items` (
 --
 
 INSERT INTO `store_items` (`id`, `service_id`, `item_name`, `item_cost_per_person`, `quantity`, `created_at`) VALUES
-(1, 1, 'PA System', 150.00, 109, '2025-04-06 06:25:22'),
-(2, 1, 'Projector & Screen', 100.00, 106, '2025-04-06 06:25:22'),
-(3, 1, 'Conference Tables & Chairs', 80.00, 102, '2025-04-06 06:25:22'),
-(4, 1, 'Corporate Banners', 50.00, 102, '2025-04-06 06:25:22'),
+(1, 1, 'PA System', 3000.00, 109, '2025-04-06 06:25:22'),
+(2, 1, 'TV Screen ', 1500.00, 106, '2025-04-06 06:25:22'),
+(3, 1, 'Conference Chairs', 100.00, 102, '2025-04-06 06:25:22'),
+(4, 1, 'Corporate Banners', 50.00, 105, '2025-04-06 06:25:22'),
 (5, 1, 'Lunch Catering', 300.00, 100, '2025-04-06 06:25:22'),
-(6, 2, 'LED Lighting Setup', 120.00, 100, '2025-04-06 06:25:22'),
+(6, 2, 'LED Lighting Setup', 1000.00, 100, '2025-04-06 06:25:22'),
 (7, 2, 'Stage & Backdrop Design', 180.00, 100, '2025-04-06 06:25:22'),
 (8, 2, 'Launch Decorations', 90.00, 100, '2025-04-06 06:25:22'),
 (9, 2, 'Branded Giveaways', 60.00, 100, '2025-04-06 06:25:22'),
 (10, 2, 'Catering (Snacks & Drinks)', 250.00, 100, '2025-04-06 06:25:22'),
 (11, 3, 'Birthday Cake', 150.00, 100, '2025-04-06 06:25:22'),
 (12, 3, 'Decorations & Balloons', 100.00, 99, '2025-04-06 06:25:22'),
-(13, 3, 'Entertainment (DJ/MC)', 120.00, 100, '2025-04-06 06:25:22'),
+(13, 3, 'Entertainment (DJ/MC)', 1200.00, 100, '2025-04-06 06:25:22'),
 (14, 3, 'Party Packs for Kids', 80.00, 86, '2025-04-06 06:25:22'),
 (15, 3, 'Food & Soft Drinks', 200.00, 100, '2025-04-06 06:25:22'),
 (16, 4, 'Sound & DJ Equipment', 180.00, 97, '2025-04-06 06:25:22'),
@@ -492,9 +482,9 @@ INSERT INTO `store_items` (`id`, `service_id`, `item_name`, `item_cost_per_perso
 (20, 4, 'Photo Booth Setup', 90.00, 100, '2025-04-06 06:25:22'),
 (21, 5, 'Card & Board Games', 60.00, 92, '2025-04-06 06:25:22'),
 (22, 5, 'Game Tables & Chairs', 80.00, 100, '2025-04-06 06:25:22'),
-(23, 5, 'Lighting Setup', 70.00, 90, '2025-04-06 06:25:22'),
-(24, 5, 'Snacks & Drinks', 100.00, 100, '2025-04-06 06:25:22'),
-(25, 5, 'MC or Host', 120.00, 100, '2025-04-06 06:25:22'),
+(23, 5, 'Lighting Setup', 1000.00, 90, '2025-04-06 06:25:22'),
+(24, 5, 'Drinks', 100.00, 100, '2025-04-06 06:25:22'),
+(25, 5, 'MC or Host', 5000.00, 100, '2025-04-06 06:25:22'),
 (26, 6, 'Basic Seating Setup', 60.00, 100, '2025-04-06 06:25:22'),
 (27, 6, 'Light Meals & Refreshments', 150.00, 100, '2025-04-06 06:25:22'),
 (28, 6, 'PA System', 100.00, 100, '2025-04-06 06:25:22'),
@@ -548,13 +538,6 @@ CREATE TABLE `supplier_payments` (
   `paid_amount` decimal(10,2) NOT NULL,
   `payment_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `supplier_payments`
---
-
-INSERT INTO `supplier_payments` (`id`, `payment_method`, `status`, `reference_code`, `supplier_id`, `storekeeper_selected_item_id`, `paid_amount`, `payment_date`) VALUES
-(11, 'mpesa', 'pending', 'QWER43ERDF', 1, 13, 35100.00, '2025-04-10 15:06:26');
 
 --
 -- Indexes for dumped tables
@@ -867,7 +850,7 @@ ALTER TABLE `storekeeper`
 -- AUTO_INCREMENT for table `storekeeper_selected_items`
 --
 ALTER TABLE `storekeeper_selected_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `store_items`
@@ -885,7 +868,7 @@ ALTER TABLE `suppliers`
 -- AUTO_INCREMENT for table `supplier_payments`
 --
 ALTER TABLE `supplier_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables

@@ -157,7 +157,6 @@ router.get('/paid-items/:supplierId', async (req, res) => {
   console.log(`[${new Date().toISOString()}] Fetching paid items for supplier: ${supplierId}`);
 
   try {
-    // Check if the supplier exists
     const [supplierCheck] = await pool.query(
       'SELECT id FROM suppliers WHERE id = ?',
       [supplierId]
@@ -170,21 +169,16 @@ router.get('/paid-items/:supplierId', async (req, res) => {
       });
     }
 
-    // Fetch all paid items for this supplier from storekeeper_selected_items and supplier_payments tables
     const [items] = await pool.query(
       `SELECT 
         ssi.id AS storekeeper_selected_item_id,
         ssi.quantity,
-        CASE
-          WHEN ssi.item_type = 'product' THEN ROUND(ssi.total_cost / ssi.quantity, 2)
-          ELSE ssi.total_cost
-        END AS total_cost,
-        ROUND(
-          CASE
-            WHEN ssi.item_type = 'product' THEN ssi.total_cost
-            ELSE ssi.total_cost * ssi.quantity
-          END, 2
-        ) AS grand_total,
+
+  
+        ROUND(ssi.total_cost / ssi.quantity, 2) AS total_cost,
+
+        ROUND(ssi.total_cost, 2) AS grand_total,
+
         sup.id AS supplier_id,
         CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,
         COALESCE(p.name, si.item_name) AS item_name,
@@ -209,7 +203,6 @@ router.get('/paid-items/:supplierId', async (req, res) => {
       });
     }
 
-    // Calculate the total amount paid for all items (as a float)
     const totalPaidAmount = items.reduce((sum, item) => sum + parseFloat(item.paid_amount), 0);
 
     res.json({

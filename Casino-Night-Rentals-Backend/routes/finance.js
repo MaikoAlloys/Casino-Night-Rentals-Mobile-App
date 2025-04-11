@@ -350,28 +350,20 @@ router.post("/approve-customer-service-payment", async (req, res) => {
 
 router.get('/fetch-items-to-pay', async (req, res) => {
   try {
-    // Fetch item details where the status is "received"
     const [itemDetails] = await pool.query(`
       SELECT
         ssi.id AS storekeeper_selected_item_id,
         ssi.quantity,
-        CASE
-          WHEN ssi.item_type = 'product' THEN ROUND(ssi.total_cost / ssi.quantity, 2)
-          ELSE ssi.total_cost
-        END AS total_cost,
-        ROUND(
-          CASE
-            WHEN ssi.item_type = 'product' THEN ssi.total_cost
-            ELSE ssi.total_cost * ssi.quantity
-          END, 2
-        ) AS grand_total,
+        -- Always treat total_cost as the final cost (grand total), no matter the item type
+        ROUND(ssi.total_cost / ssi.quantity, 2) AS unit_cost,
+        ROUND(ssi.total_cost, 2) AS grand_total,
         sup.id AS supplier_id,
         CONCAT(sup.first_name, ' ', sup.last_name) AS supplier_full_name,
         COALESCE(p.name, si.item_name) AS item_name
       FROM storekeeper_selected_items ssi
       JOIN suppliers sup ON ssi.supplier_id = sup.id
       LEFT JOIN products p ON ssi.item_type = 'product' AND ssi.item_id = p.id
-      LEFT JOIN store_items si ON ssi.item_type = 'service' AND ssi.item_id = si.id
+      LEFT JOIN store_items si ON ssi.item_type = 'service' AND si.id = ssi.item_id
       WHERE ssi.status = 'received'
     `);
 
@@ -379,12 +371,10 @@ router.get('/fetch-items-to-pay', async (req, res) => {
       return res.status(404).json({ success: false, message: 'No items found with received status' });
     }
 
-    // Ensure grand_total is returned as a proper number
     itemDetails.forEach(item => {
-      item.grand_total = parseFloat(item.grand_total); // Ensure grand_total is a float number
+      item.grand_total = parseFloat(item.grand_total);
     });
 
-    // Return the fetched items as a response
     return res.status(200).json({
       success: true,
       data: itemDetails
@@ -395,6 +385,7 @@ router.get('/fetch-items-to-pay', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
   //paying supplier
   // Endpoint for finance to make a payment to supplier

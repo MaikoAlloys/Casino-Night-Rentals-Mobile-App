@@ -41,14 +41,15 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Supplier Name</th>
             <th>Item Name</th>
             <th>Item Type</th>
             <th>Quantity</th>
             <th>Total Cost</th>
-            <th>Storekeeper Status</th>
+            <th>Finance Status</th>
             <th>Payment Method</th>
             <th>Reference</th>
-            <th>Payment Status</th>
+            <th>Supplier Confirmation Status</th>
             <th>Paid Amount</th>
             <th>Payment Date</th>
           </tr>
@@ -56,6 +57,7 @@
         <tbody>
           <tr v-for="(payment, index) in paginatedPayments" :key="payment.storekeeper_selected_item_id + '-' + payment.reference_code">
             <td>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+            <td>{{ payment.supplier_full_name}}</td>
             <td>{{ payment.item_name || 'N/A' }}</td>
             <td>{{ payment.item_type }}</td>
             <td>{{ payment.quantity }}</td>
